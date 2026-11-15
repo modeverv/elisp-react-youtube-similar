@@ -1,0 +1,326 @@
+{
+  "kind": "youtube#videoCategoryListResponse",
+  "etag": "bLkBGuCklbtv5znbhCsQbU5I5FQ",
+  "items": [
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "_IRhzOkClhfoACdsrK4N4YYKhmE",
+      "id": "1",
+      "snippet": {
+        "title": "映画とアニメ",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "0iBQMmeigywwMcPmA685X_ZhKSE",
+      "id": "2",
+      "snippet": {
+        "title": "自動車と乗り物",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "j-fg4orvNNmKjx94UTena-RRSL0",
+      "id": "10",
+      "snippet": {
+        "title": "音楽",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "nfNQ-iAhDeLwS4R9yUtncfTZ3ns",
+      "id": "15",
+      "snippet": {
+        "title": "ペットと動物",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "4jCqE774fdi5KwvjoK8Ef3HpRA4",
+      "id": "17",
+      "snippet": {
+        "title": "スポーツ",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "x1dqEaiZQW9HYgB3I1SPQDEjTdc",
+      "id": "18",
+      "snippet": {
+        "title": "ショート ムービー",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "9fL-CRfzPE4nkZ-xcIV36f__M9w",
+      "id": "19",
+      "snippet": {
+        "title": "旅行とイベント",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "jPZoh91G5lgd_kNZFVmpyJP6_2k",
+      "id": "20",
+      "snippet": {
+        "title": "ゲーム",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "iXvcUHCVYg1ZeyeZVjSS-jG436Y",
+      "id": "21",
+      "snippet": {
+        "title": "ブログ",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "9yKmQxOgO_qCO8DxFqapP3jybGA",
+      "id": "22",
+      "snippet": {
+        "title": "ブログ",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "cFcT4gHeN96v-2qONtZBmQ2VHhE",
+      "id": "23",
+      "snippet": {
+        "title": "コメディー",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "KyWdAYnP-8iJv12ZCeR2O4cLmUc",
+      "id": "24",
+      "snippet": {
+        "title": "エンターテイメント",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "RaJ5TFHRjkh09ZeZ7xdk1m9q2eY",
+      "id": "25",
+      "snippet": {
+        "title": "ニュースと政治",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "rH03KQHEopf53cOOWQ3k61gftNE",
+      "id": "26",
+      "snippet": {
+        "title": "ハウツーとスタイル",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "4Z8cckYKz5QhtaeqtsUUv8_shcg",
+      "id": "27",
+      "snippet": {
+        "title": "教育",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "FwyJ9DtBIFKK6GCsORncahcH_8Q",
+      "id": "28",
+      "snippet": {
+        "title": "科学と技術",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "Yow9ZuF5b_ORHUHqGMBFHrpusBU",
+      "id": "29",
+      "snippet": {
+        "title": "非営利団体と社会活動",
+        "assignable": true,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "KLmoIzunwK5vAF3aQVL2QYZvtEE",
+      "id": "30",
+      "snippet": {
+        "title": "映画",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "ivlLDml8DadbNf_8zTZmzeYzxr4",
+      "id": "31",
+      "snippet": {
+        "title": "アニメ",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "1Sp1Nw87RhNavQpt_JsDXaGClnc",
+      "id": "32",
+      "snippet": {
+        "title": "アクション/アドベンチャー",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "xYezxRJ94-gzRceQidvB3IkkIm4",
+      "id": "33",
+      "snippet": {
+        "title": "クラシック",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "0VWZotcIjw07stujLaZZwjlNPsM",
+      "id": "34",
+      "snippet": {
+        "title": "コメディー",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "3cSRfyuSXQTPY6TluaGC6StYDs8",
+      "id": "35",
+      "snippet": {
+        "title": "ドキュメンタリー",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "KSjPM9KGq4LJUGRk6HcLvjtH1Io",
+      "id": "36",
+      "snippet": {
+        "title": "ドラマ",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "pqhifIWIqZpwxSFEsU-dfZMCSNk",
+      "id": "37",
+      "snippet": {
+        "title": "家族向け",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "wMDC8rjgW5EALi2VoWIf4CEORu8",
+      "id": "38",
+      "snippet": {
+        "title": "海外",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "HW62yrEPn3XDfGbTx0TFZK73HZg",
+      "id": "39",
+      "snippet": {
+        "title": "ホラー",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "o9NaRZwxUhKKzPllj_kw50ZaNfY",
+      "id": "40",
+      "snippet": {
+        "title": "SF/ファンタジー",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "GKDJjcZ1OcfndikBN1hglDVkb2A",
+      "id": "41",
+      "snippet": {
+        "title": "サスペンス",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "SfJsSf0euhgkk6s7ZNBsq-l8BRY",
+      "id": "42",
+      "snippet": {
+        "title": "ショート",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "CF5AfgZJvrzppKW4uWLhC-HkbP0",
+      "id": "43",
+      "snippet": {
+        "title": "番組",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    },
+    {
+      "kind": "youtube#videoCategory",
+      "etag": "83x2QyVqyrLAcJlMzVv0kf9EgvU",
+      "id": "44",
+      "snippet": {
+        "title": "予告編",
+        "assignable": false,
+        "channelId": "UCBR8-60-B28hp2BmDPdntcQ"
+      }
+    }
+  ]
+}

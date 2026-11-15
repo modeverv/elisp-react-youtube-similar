@@ -56,7 +56,17 @@ render.  Components that skip renders (`:pure') get it as a prop too.")
     (clear "すべて削除" "Clear all")
     (remove "削除" "Remove")
     (live "ライブ" "LIVE")
+    (upcoming "配信予定" "UPCOMING")
+    (menu "メニュー" "Menu")
+    (api-key-remember "このブラウザに保存する" "Remember in this browser")
     (cannot-play "この動画はここでは再生できません（エラー %s）。" "This video cannot be played here (error %s).")
+    (player-100 "動画が見つかりません。削除されたか非公開です（エラー 100）。"
+                "The video is not there: removed or private (error 100).")
+    (player-150 "投稿者が他のサイトでの再生を許可していません（エラー %s）。「YouTube で開く」から見られます。"
+                "Its owner does not allow playback on other sites (error %s). Open it on YouTube.")
+    (player-153 "プレーヤーが参照元（Referer）を受け取れませんでした（エラー 153）。"
+                "The player got no Referer from this page (error 153).")
+    (not-found "動画が見つかりません（削除されたか、非公開です）。" "Video not found (removed or private).")
     (no-description "説明はありません。" "No description.")
     (description-need-more "説明・再生回数・日付は API キーを設定するか、サーバーモードで表示されます。"
                            "Descriptions, views and dates need an API key or the server mode.")
@@ -67,8 +77,8 @@ render.  Components that skip renders (`:pure') get it as a prop too.")
     (mode-server-long "サーバーの Emacs がフィードを読みます" "The server's Emacs reads the feeds")
     (mode-curated-long "選んだ動画 + oEmbed（キー不要）" "Chosen videos + oEmbed (no key)")
     (api-key "YouTube Data API キー" "YouTube Data API key")
-    (api-key-help "キーはこのブラウザの localStorage にだけ保存されます。HTTP リファラーと YouTube Data API v3 に制限したキーを使ってください。"
-                  "The key is kept in this browser's localStorage only. Use a key restricted to HTTP referrers and to the YouTube Data API v3.")
+    (api-key-help "保存しなければ、キーはこのタブを閉じるまでしか使われません。保存すると localStorage に残り、同じオリジン（modeverv.github.io）の他のページからも読めます。HTTP リファラーと YouTube Data API v3 に制限したキーを使ってください。"
+                  "Unless you remember it, the key is used until this tab closes. Remembered, it stays in localStorage, where every page of the same origin (modeverv.github.io) can read it. Use a key restricted to HTTP referrers and to the YouTube Data API v3.")
     (api-key-save "保存" "Save")
     (api-key-remove "キーを削除" "Remove key")
     (language "言語" "Language")
@@ -192,10 +202,14 @@ elisp-react prints a list as it is, (a b), so classes are joined here."
   (string-join (delq nil names) " "))
 
 (defun parens-decode (text)
-  "TEXT with %XX escapes decoded as UTF-8."
+  "TEXT with %XX escapes decoded as UTF-8.
+Bytes that are not UTF-8 (a link cut in the middle of a character)
+become U+FFFD: a raw byte would make `json-serialize' fail later."
   ;; As bytes first: a hash typed by hand may hold raw characters too.
-  (decode-coding-string (url-unhex-string (encode-coding-string (replace-regexp-in-string "\\+" " " text) 'utf-8))
-                        'utf-8))
+  (let ((decoded (decode-coding-string
+                  (url-unhex-string (encode-coding-string (replace-regexp-in-string "\\+" " " text) 'utf-8))
+                  'utf-8)))
+    (apply #'string (mapcar (lambda (char) (if (>= char #x3fff80) #xfffd char)) decoded))))
 
 (defun parens-json (object)
   "OBJECT as JSON text, as characters.
@@ -209,7 +223,8 @@ elisp-react prints a list as it is, (a b), so classes are joined here."
     (seq-reduce (lambda (total part) (+ (* total 60) part)) parts 0)))
 
 (defconst parens--token-regexp
-  (concat "\\(?1:https?://[^][ \t\n<>\"]+[^][ \t\n<>\".,;:!?)]\\)"   ; a URL
+  ;; A URL is ASCII: Japanese text right after a link is not part of it.
+  (concat "\\(?1:https?://[-A-Za-z0-9._~:/?#@!$&'()*+,;=%]*[-A-Za-z0-9_~/#@$&*+=%]\\)"   ; a URL
           "\\|\\(?2:\\b\\(?:[0-9]?[0-9]:\\)?[0-5]?[0-9]:[0-5][0-9]\\b\\)" ; a timestamp
           "\\|\\(?3:#[[:alnum:]_]+\\)")                              ; a hashtag
   "What `parens-linkify' turns into links.")

@@ -250,7 +250,7 @@
   (should (null parens-port--outbox))
   ;; A chip: only the space videos.
   (let ((chip (parens-test-host (lambda (props host) (and (eq (react--host-tag host) 'button)
-                                                          (equal (plist-get props :role) "tab")
+                                                          (equal (plist-get props :class) "chip")
                                                           (equal (react-html-of host) "宇宙"))))))
     (should chip)
     (parens-test-event chip "click" :type "click")
@@ -272,9 +272,15 @@
     (should (string-match-p "start=30" html))
     ;; Emacs 29's url-build-query-string escapes ":" and "/", 30 does not.
     (should (string-match-p "origin=https\\(://\\|%3A%2F%2F\\)example.test" html))
-    (should (string-match-p "credentialless" html))
+    ;; Not cross-origin isolated (a static host): a plain frame, with cookies.
+    (should-not (string-match-p "credentialless" html))
     (should (string-match-p "referrerpolicy=\"strict-origin-when-cross-origin\"" html))
     (should (string-match-p "Video JJPokfFxyFo" html)))
+  ;; In elisp-studio's preview (isolated) the frame must be credentialless.
+  (parens-test-message (list :type "hello" :url "#/watch?v=JJPokfFxyFo&t=30" :origin "https://example.test"
+                             :studio t :isolated t :light :false))
+  (parens-test-apply (react-flush))
+  (should (string-match-p "credentialless" (parens-test-html)))
   ;; Related: the same channel first.
   (let ((related (parens-test-hosts (lambda (props host) (and (eq (react--host-tag host) 'article)
                                                               (string-match-p "wide-card" (or (plist-get props :class) "")))))))
@@ -292,7 +298,7 @@
                  "#/watch?v=-9rpQA6O3aM"))
   ;; A player error is shown.
   (parens-test-message (list :type "player-error" :id "-9rpQA6O3aM" :code 150))
-  (should (string-match-p "エラー 150" (parens-test-html))))
+  (should (string-match-p "他のサイトでの再生を許可していません（エラー 150）" (parens-test-html))))
 
 (ert-deftest parens-search-and-keys ()
   (parens-test-start)
@@ -337,7 +343,7 @@
   ;; In elisp-studio the tab's server cannot read the feeds (CORS): 502.
   (parens-test-respond "\\`api/feed\\'" 502 (prin1-to-string "fetch failed: Failed to fetch"))
   (should (eq parens-mode 'curated))
-  (should (string-match-p "Failed to fetch" parens-mode-note)))
+  (should (string-match-p "Failed to fetch" (parens-mode-note-text))))
 
 (ert-deftest parens-api-mode ()
   (parens-test-start '(("parens/api-key" . "TEST-KEY")))
@@ -381,10 +387,19 @@
   (parens-test-apply (react-flush))
   (should (string-match-p "Watch later" (parens-test-html)))
   (should-not (string-match-p "後で見る" (parens-test-html)))
-  ;; Old entries are dropped when the page starts again.
+  ;; A key is kept for the page's life only, unless remembered.
+  (parens-use-key "SESSION-KEY")
+  (should (equal parens-api-key "SESSION-KEY"))
+  (should-not (react-storage-get "parens/api-key"))
+  (parens-use-key "REMEMBERED-KEY" t)
+  (should (equal (react-storage-get "parens/api-key") "REMEMBERED-KEY"))
+  (parens-use-key nil)
+  (should-not (react-storage-get "parens/api-key"))
+  ;; Old entries are dropped when the page starts again, also from storage.
   (let ((old (list :id "8V4ZyEL_i-s" :title "old" :saved (- (float-time) (* 40 86400)))))
     (parens-test-start (list (cons "parens/later" (list old))))
-    (should (null (parens-app-state :later)))))
+    (should (null (parens-app-state :later)))
+    (should (null (react-storage-get "parens/later")))))
 
 (provide 'parens-test)
 ;;; parens-test.el ends here

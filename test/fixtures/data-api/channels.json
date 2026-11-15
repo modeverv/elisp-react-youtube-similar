@@ -1,0 +1,639 @@
+{
+  "kind": "youtube#channelListResponse",
+  "etag": "sLfFMaUJWtX-CNhsKEUIbj6feCE",
+  "pageInfo": {
+    "totalResults": 14,
+    "resultsPerPage": 14
+  },
+  "items": [
+    {
+      "kind": "youtube#channel",
+      "etag": "bvJBSRoYChVLCEvxKSk_zJpEhfU",
+      "id": "UC0uTPqBCFIpZxlz_Lv1tk_g",
+      "snippet": {
+        "title": "Buffer Garden",
+        "description": "Buffer Garden: a made-up channel for the Parens browser test.",
+        "customUrl": "@buffergarden",
+        "publishedAt": "2010-01-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-buffergarden=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-buffergarden=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-buffergarden=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Buffer Garden",
+          "description": "Buffer Garden: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UU0uTPqBCFIpZxlz_Lv1tk_g"
+        }
+      },
+      "statistics": {
+        "viewCount": "3000000",
+        "subscriberCount": "310000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "100"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "axixQGxlwxZkcTjGQReFGA4Jah8",
+      "id": "UCAiiOTio8Yu69c3XnR7nQBQ",
+      "snippet": {
+        "title": "Config Workshop",
+        "description": "Config Workshop: a made-up channel for the Parens browser test.",
+        "customUrl": "@configworkshop",
+        "publishedAt": "2011-02-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-configworkshop=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-configworkshop=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-configworkshop=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Config Workshop",
+          "description": "Config Workshop: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUAiiOTio8Yu69c3XnR7nQBQ"
+        }
+      },
+      "statistics": {
+        "viewCount": "4000000",
+        "subscriberCount": "220000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "137"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "SGON_1o3Qxpl_WpplV3ueRS_HzQ",
+      "id": "UC9-y-6csu5WGm29I7JiwpnA",
+      "snippet": {
+        "title": "Byte Talks",
+        "description": "Byte Talks: a made-up channel for the Parens browser test.",
+        "customUrl": "@bytetalks",
+        "publishedAt": "2012-03-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-bytetalks=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-bytetalks=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-bytetalks=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Byte Talks",
+          "description": "Byte Talks: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UU9-y-6csu5WGm29I7JiwpnA"
+        }
+      },
+      "statistics": {
+        "viewCount": "5000000",
+        "subscriberCount": "2400000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "174"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "YuNNGZD7TxBjESA062UgmXecII4",
+      "id": "UCnUYZLuoy1rq1aVMwx4aTzw",
+      "snippet": {
+        "title": "Render Loop",
+        "description": "Render Loop: a made-up channel for the Parens browser test.",
+        "customUrl": "@renderloop",
+        "publishedAt": "2013-04-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-renderloop=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-renderloop=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-renderloop=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Render Loop",
+          "description": "Render Loop: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUnUYZLuoy1rq1aVMwx4aTzw"
+        }
+      },
+      "statistics": {
+        "viewCount": "6000000",
+        "subscriberCount": "1100000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "211"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "2zAE1Gm9gk_stCx8YEScj7ieNGA",
+      "id": "UC_x5XG1OV2P6uZZ5FSM9Ttw",
+      "snippet": {
+        "title": "Dev Notes Daily",
+        "description": "Dev Notes Daily: a made-up channel for the Parens browser test.",
+        "customUrl": "@devnotesdaily",
+        "publishedAt": "2014-05-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-devnotesdaily=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-devnotesdaily=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-devnotesdaily=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Dev Notes Daily",
+          "description": "Dev Notes Daily: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UU_x5XG1OV2P6uZZ5FSM9Ttw"
+        }
+      },
+      "statistics": {
+        "viewCount": "7000000",
+        "subscriberCount": "2600000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "248"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "AxI2T1OypleYBggw4nUjQK6vzyk",
+      "id": "UCYO_jab_esuFRV4b17AJtAw",
+      "snippet": {
+        "title": "Vector Sketches",
+        "description": "Vector Sketches: a made-up channel for the Parens browser test.",
+        "customUrl": "@vectorsketches",
+        "publishedAt": "2015-06-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-vectorsketches=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-vectorsketches=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-vectorsketches=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Vector Sketches",
+          "description": "Vector Sketches: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUYO_jab_esuFRV4b17AJtAw"
+        }
+      },
+      "statistics": {
+        "viewCount": "8000000",
+        "subscriberCount": "7200000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "285"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "4BJkeWplWRAkp9G8Wd_oswktcJU",
+      "id": "UCoxcjq-8xIDTYp3uz647V5A",
+      "snippet": {
+        "title": "Prime Corner",
+        "description": "Prime Corner: a made-up channel for the Parens browser test.",
+        "customUrl": "@primecorner",
+        "publishedAt": "2016-07-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-primecorner=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-primecorner=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-primecorner=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Prime Corner",
+          "description": "Prime Corner: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUoxcjq-8xIDTYp3uz647V5A"
+        }
+      },
+      "statistics": {
+        "viewCount": "9000000",
+        "subscriberCount": "4500000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "322"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "Knjm5JyPsTnyH-_nvvNKfq9U8J4",
+      "id": "UCsXVk37bltHxD1rDPwtNM8Q",
+      "snippet": {
+        "title": "Small Universe",
+        "description": "Small Universe: a made-up channel for the Parens browser test.",
+        "customUrl": "@smalluniverse",
+        "publishedAt": "2017-08-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-smalluniverse=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-smalluniverse=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-smalluniverse=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Small Universe",
+          "description": "Small Universe: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUsXVk37bltHxD1rDPwtNM8Q"
+        }
+      },
+      "statistics": {
+        "viewCount": "10000000",
+        "subscriberCount": "24000000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "359"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "LnPKdtt7TOZPKVqdmZpRHumn21o",
+      "id": "UCLA_DiR1FfKNvjuUpBHmylQ",
+      "snippet": {
+        "title": "Orbit Desk",
+        "description": "Orbit Desk: a made-up channel for the Parens browser test.",
+        "customUrl": "@orbitdesk",
+        "publishedAt": "2018-09-10T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-orbitdesk=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-orbitdesk=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-orbitdesk=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Orbit Desk",
+          "description": "Orbit Desk: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UULA_DiR1FfKNvjuUpBHmylQ"
+        }
+      },
+      "statistics": {
+        "viewCount": "11000000",
+        "subscriberCount": "12000000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "396"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "sYAly8A77Kfig0GT8jmKD-b01ko",
+      "id": "UCfixtureParensChannel0A",
+      "snippet": {
+        "title": "Lambda Workshop",
+        "description": "Lambda Workshop: a made-up channel for the Parens browser test.",
+        "customUrl": "@lambdaworkshop",
+        "publishedAt": "2015-04-01T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-lambdaworkshop=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-lambdaworkshop=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-lambdaworkshop=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Lambda Workshop",
+          "description": "Lambda Workshop: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUfixtureParensChannel0A"
+        }
+      },
+      "statistics": {
+        "viewCount": "98765432",
+        "subscriberCount": "1250000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "312"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "MXRQcIJT-FUP_uAaW8VZ84Uz4lY",
+      "id": "UCfixtureParensChannel0B",
+      "snippet": {
+        "title": "Cons Cell Science",
+        "description": "Cons Cell Science: a made-up channel for the Parens browser test.",
+        "customUrl": "@conscellscience",
+        "publishedAt": "2017-09-12T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-conscellscience=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-conscellscience=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-conscellscience=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Cons Cell Science",
+          "description": "Cons Cell Science: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUfixtureParensChannel0B"
+        }
+      },
+      "statistics": {
+        "viewCount": "5432100",
+        "subscriberCount": "48200",
+        "hiddenSubscriberCount": false,
+        "videoCount": "87"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "rPLXDTb1K8YkFQ74Z4Izt5z9iEI",
+      "id": "UCfixtureParensChannel0C",
+      "snippet": {
+        "title": "Tail Call Lessons",
+        "description": "Tail Call Lessons: a made-up channel for the Parens browser test.",
+        "customUrl": "@tailcalllessons",
+        "publishedAt": "2019-01-15T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-tailcalllessons=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-tailcalllessons=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-tailcalllessons=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Tail Call Lessons",
+          "description": "Tail Call Lessons: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUfixtureParensChannel0C"
+        }
+      },
+      "statistics": {
+        "viewCount": "321000",
+        "subscriberCount": "9100",
+        "hiddenSubscriberCount": false,
+        "videoCount": "45"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "7Hv4BffobBrMOqguNkhxwuwLrdo",
+      "id": "UCfixtureParensChannel0D",
+      "snippet": {
+        "title": "Quote Unquote Arcade",
+        "description": "Quote Unquote Arcade: a made-up channel for the Parens browser test.",
+        "customUrl": "@quoteunquotearcade",
+        "publishedAt": "2012-06-30T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-quoteunquotearcade=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-quoteunquotearcade=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-quoteunquotearcade=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Quote Unquote Arcade",
+          "description": "Quote Unquote Arcade: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUfixtureParensChannel0D"
+        }
+      },
+      "statistics": {
+        "viewCount": "456789012",
+        "subscriberCount": "2300000",
+        "hiddenSubscriberCount": false,
+        "videoCount": "1520"
+      }
+    },
+    {
+      "kind": "youtube#channel",
+      "etag": "sAsKFReeoB-yfwwBRLf1Ut7Ko3g",
+      "id": "UCfixtureParensChannel0E",
+      "snippet": {
+        "title": "Quote Unquote Music",
+        "description": "Quote Unquote Music: a made-up channel for the Parens browser test.",
+        "customUrl": "@quoteunquotemusic",
+        "publishedAt": "2018-03-03T12:00:00Z",
+        "thumbnails": {
+          "default": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-quoteunquotemusic=s88-c-k-c0x00ffffff-no-rj",
+            "width": 88,
+            "height": 88
+          },
+          "medium": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-quoteunquotemusic=s240-c-k-c0x00ffffff-no-rj",
+            "width": 240,
+            "height": 240
+          },
+          "high": {
+            "url": "https://yt3.ggpht.com/fixture-avatar-quoteunquotemusic=s800-c-k-c0x00ffffff-no-rj",
+            "width": 800,
+            "height": 800
+          }
+        },
+        "localized": {
+          "title": "Quote Unquote Music",
+          "description": "Quote Unquote Music: a made-up channel for the Parens browser test."
+        },
+        "country": "JP"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "likes": "",
+          "uploads": "UUfixtureParensChannel0E"
+        }
+      },
+      "statistics": {
+        "viewCount": "12345678",
+        "hiddenSubscriberCount": true,
+        "videoCount": "230"
+      }
+    }
+  ]
+}

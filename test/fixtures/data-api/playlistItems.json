@@ -1,0 +1,1506 @@
+{
+  "kind": "youtube#playlistItemListResponse",
+  "etag": "eWPEeMJ7srJ0q0PBOce6FqiUJdQ",
+  "items": [
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "SBNip6oDNRfc2apIkIf5haqfiXw",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBBLmZ4QXBpVmlkXzAy",
+      "snippet": {
+        "publishedAt": "2024-03-05T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0A",
+        "title": "Writing a tiny Lisp in one evening",
+        "description": "Writing a tiny Lisp interpreter in one evening, with nothing but a text editor and a cup of tea.\n\nNotes and code: https://example.com/parens-notes\n\nChapters\n0:00 Reading\n1:23 Evaluating\n12:40 Printing\n\nA made-up video for the Parens browser test: no such video exists.\n#parens #fixture",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_02/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_02/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_02/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Lambda Workshop",
+        "playlistId": "UUfixtureParensChannel0A",
+        "position": 0,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_02"
+        },
+        "videoOwnerChannelTitle": "Lambda Workshop",
+        "videoOwnerChannelId": "UCfixtureParensChannel0A"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_02",
+        "videoPublishedAt": "2024-03-05T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "xaMNxBp55X8i-OG6I92iGId0RSI",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBBLmZ4QXBpVmlkXzAz",
+      "snippet": {
+        "publishedAt": "2024-02-11T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0A",
+        "title": "Tail calls without the jargon",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_03/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_03/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_03/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Lambda Workshop",
+        "playlistId": "UUfixtureParensChannel0A",
+        "position": 1,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_03"
+        },
+        "videoOwnerChannelTitle": "Lambda Workshop",
+        "videoOwnerChannelId": "UCfixtureParensChannel0A"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_03",
+        "videoPublishedAt": "2024-02-11T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "19aMlA8eTyyvqcAvLJ-ny-PkOl8",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBBLmZ4QXBpVmlkXzA0",
+      "snippet": {
+        "publishedAt": "2023-11-20T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0A",
+        "title": "Garbage collectors, drawn by hand",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_04/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_04/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_04/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Lambda Workshop",
+        "playlistId": "UUfixtureParensChannel0A",
+        "position": 2,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_04"
+        },
+        "videoOwnerChannelTitle": "Lambda Workshop",
+        "videoOwnerChannelId": "UCfixtureParensChannel0A"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_04",
+        "videoPublishedAt": "2023-11-20T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "tdqaIFxJ6-o_kUmhv1Z_DY2ASt4",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBBLmZ4QXBpVmlkXzMz",
+      "snippet": {
+        "publishedAt": "2022-04-01T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0A",
+        "title": "Lisp at the speed of thought",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_33/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_33/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_33/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Lambda Workshop",
+        "playlistId": "UUfixtureParensChannel0A",
+        "position": 3,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_33"
+        },
+        "videoOwnerChannelTitle": "Lambda Workshop",
+        "videoOwnerChannelId": "UCfixtureParensChannel0A"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_33",
+        "videoPublishedAt": "2022-04-01T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "VNUMJ-JByipbQEcQ8VL1x0lbsBg",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBBLmZ4QXBpVmlkXzM0",
+      "snippet": {
+        "publishedAt": "2021-10-10T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0A",
+        "title": "Parentheses, a love letter",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_34/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_34/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_34/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Lambda Workshop",
+        "playlistId": "UUfixtureParensChannel0A",
+        "position": 4,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_34"
+        },
+        "videoOwnerChannelTitle": "Lambda Workshop",
+        "videoOwnerChannelId": "UCfixtureParensChannel0A"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_34",
+        "videoPublishedAt": "2021-10-10T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "C2E78A-yJR4G7qFSDhTxO5uT07I",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzA3",
+      "snippet": {
+        "publishedAt": "2026-11-14T03:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "Live: building a cloud chamber",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_07/default_live.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_07/mqdefault_live.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_07/hqdefault_live.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 0,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_07"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_07",
+        "videoPublishedAt": "2026-11-14T03:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "DemeW2anynE5ePrLM9f3XmvPgAA",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzEy",
+      "snippet": {
+        "publishedAt": "2026-01-01T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "Paper that holds a car",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_12/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_12/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_12/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 1,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_12"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_12",
+        "videoPublishedAt": "2026-01-01T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "8Vg1zr198VTK6gpNYZUsKY8NSwk",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzEx",
+      "snippet": {
+        "publishedAt": "2025-07-07T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "The smallest motor",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_11/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_11/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_11/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 2,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_11"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_11",
+        "videoPublishedAt": "2025-07-07T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "m1dvLBYOY06ILDKYPfmkNj-j0O8",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzEw",
+      "snippet": {
+        "publishedAt": "2024-12-01T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "Ice that burns",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_10/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_10/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_10/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 3,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_10"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_10",
+        "videoPublishedAt": "2024-12-01T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "REow5YIgqKMS-XTBP-cyDh-oxC0",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzAx",
+      "snippet": {
+        "publishedAt": "2023-06-10T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "How a rainbow bends light",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_01/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_01/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_01/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 4,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_01"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_01",
+        "videoPublishedAt": "2023-06-10T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "uWu0GJfc7kiITnjbxdu4iXAYhIQ",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzA1",
+      "snippet": {
+        "publishedAt": "2023-01-02T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "Members-only lab tour",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_05/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_05/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_05/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 5,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_05"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_05",
+        "videoPublishedAt": "2023-01-02T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "bpuwSPtbrJICWZbjxu-kMFzwlOw",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzA2",
+      "snippet": {
+        "publishedAt": "2022-08-08T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "Why the sky is dark at night",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_06/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_06/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_06/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 6,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_06"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_06",
+        "videoPublishedAt": "2022-08-08T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "D7lnqhnCsFGz3VVafmqAhhyT1h8",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzA4",
+      "snippet": {
+        "publishedAt": "2021-05-05T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "Magnets, slowly",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_08/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_08/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_08/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 7,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_08"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_08",
+        "videoPublishedAt": "2021-05-05T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "dLzzXVbwaUrSj6YO5BDBg_B3kdM",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBCLmZ4QXBpVmlkXzA5",
+      "snippet": {
+        "publishedAt": "2020-02-20T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0B",
+        "title": "Counting atoms in a teaspoon",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_09/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_09/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_09/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Cons Cell Science",
+        "playlistId": "UUfixtureParensChannel0B",
+        "position": 8,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_09"
+        },
+        "videoOwnerChannelTitle": "Cons Cell Science",
+        "videoOwnerChannelId": "UCfixtureParensChannel0B"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_09",
+        "videoPublishedAt": "2020-02-20T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "87MXDsph_pvU6lK3T1X1BjpRFBE",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzE4",
+      "snippet": {
+        "publishedAt": "2025-02-02T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "Big O, small words",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_18/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_18/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_18/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 0,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_18"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_18",
+        "videoPublishedAt": "2025-02-02T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "5k5vnfBAjUuPMEe9vbNntb9hKIA",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzE5",
+      "snippet": {
+        "publishedAt": "2024-06-06T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "How to read a long manual",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_19/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_19/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_19/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 1,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_19"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_19",
+        "videoPublishedAt": "2024-06-06T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "slJ5xnbMfw6Sb51Mpt-prgjry9o",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzEz",
+      "snippet": {
+        "publishedAt": "2023-09-09T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "Lisp macros for the curious",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_13/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_13/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_13/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 2,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_13"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_13",
+        "videoPublishedAt": "2023-09-09T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "Z7UtSlK2ZSzGs48LbYek9_jfaeY",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzIw",
+      "snippet": {
+        "publishedAt": "2023-03-23T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "Note-taking for programmers",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_20/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_20/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_20/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 3,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_20"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_20",
+        "videoPublishedAt": "2023-03-23T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "oJU0jSstjMtmTH_xtfIB2zWAjCE",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzE0",
+      "snippet": {
+        "publishedAt": "2022-03-03T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "Reading a proof out loud",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_14/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_14/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_14/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 4,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_14"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_14",
+        "videoPublishedAt": "2022-03-03T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "97W2XMPovKDCq0pZvmRE3riR11Q",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzE1",
+      "snippet": {
+        "publishedAt": "2021-11-11T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "Fractions on a number line",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_15/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_15/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_15/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 5,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_15"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_15",
+        "videoPublishedAt": "2021-11-11T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "M42V1iL2vEESy4Vnu01SrCeQY-c",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzE2",
+      "snippet": {
+        "publishedAt": "2020-10-10T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "Learning to type with two fingers",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_16/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_16/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_16/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 6,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_16"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_16",
+        "videoPublishedAt": "2020-10-10T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "1Ag1cvXPWmmMwUerUXCwAK5Po-U",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBDLmZ4QXBpVmlkXzE3",
+      "snippet": {
+        "publishedAt": "2019-09-19T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0C",
+        "title": "A gentle start with recursion",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_17/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_17/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_17/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Tail Call Lessons",
+        "playlistId": "UUfixtureParensChannel0C",
+        "position": 7,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_17"
+        },
+        "videoOwnerChannelTitle": "Tail Call Lessons",
+        "videoOwnerChannelId": "UCfixtureParensChannel0C"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_17",
+        "videoPublishedAt": "2019-09-19T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "KEiEaxtr719f5vyTKVWNr9KfMxk",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBELmZ4QXBpVmlkXzIx",
+      "snippet": {
+        "publishedAt": "2025-10-01T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0D",
+        "title": "Speedrun: the parenthesis maze",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_21/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_21/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_21/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Arcade",
+        "playlistId": "UUfixtureParensChannel0D",
+        "position": 0,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_21"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Arcade",
+        "videoOwnerChannelId": "UCfixtureParensChannel0D"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_21",
+        "videoPublishedAt": "2025-10-01T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "9WE5gP-daaXp-5oUBg0ggRgIw_U",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBELmZ4QXBpVmlkXzIy",
+      "snippet": {
+        "publishedAt": "2025-08-15T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0D",
+        "title": "Puzzle night: balancing brackets",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_22/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_22/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_22/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Arcade",
+        "playlistId": "UUfixtureParensChannel0D",
+        "position": 1,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_22"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Arcade",
+        "videoOwnerChannelId": "UCfixtureParensChannel0D"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_22",
+        "videoPublishedAt": "2025-08-15T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "oBQsH03cAmR3F6fz3vWpU4qOJIQ",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBELmZ4QXBpVmlkXzIz",
+      "snippet": {
+        "publishedAt": "2024-04-04T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0D",
+        "title": "Retro arcade on a 486",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_23/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_23/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_23/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Arcade",
+        "playlistId": "UUfixtureParensChannel0D",
+        "position": 2,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_23"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Arcade",
+        "videoOwnerChannelId": "UCfixtureParensChannel0D"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_23",
+        "videoPublishedAt": "2024-04-04T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "ClYP4P843-vV_DMurzzaE5Y1xl8",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBELmZ4QXBpVmlkXzI0",
+      "snippet": {
+        "publishedAt": "2023-12-12T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0D",
+        "title": "Chess openings with an old editor",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_24/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_24/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_24/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Arcade",
+        "playlistId": "UUfixtureParensChannel0D",
+        "position": 3,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_24"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Arcade",
+        "videoOwnerChannelId": "UCfixtureParensChannel0D"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_24",
+        "videoPublishedAt": "2023-12-12T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "H7ptVKVPvBDbJRECd8YyVgofTnA",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBELmZ4QXBpVmlkXzI1",
+      "snippet": {
+        "publishedAt": "2022-02-22T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0D",
+        "title": "Tetris in a text buffer",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_25/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_25/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_25/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Arcade",
+        "playlistId": "UUfixtureParensChannel0D",
+        "position": 4,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_25"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Arcade",
+        "videoOwnerChannelId": "UCfixtureParensChannel0D"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_25",
+        "videoPublishedAt": "2022-02-22T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "lyYbZIkOEOQdG2ICWX7Q97zSPG8",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBELmZ4QXBpVmlkXzI2",
+      "snippet": {
+        "publishedAt": "2021-01-21T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0D",
+        "title": "Snake, with one hand",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_26/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_26/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_26/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Arcade",
+        "playlistId": "UUfixtureParensChannel0D",
+        "position": 5,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_26"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Arcade",
+        "videoOwnerChannelId": "UCfixtureParensChannel0D"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_26",
+        "videoPublishedAt": "2021-01-21T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "dJJKkoLJufeBgRq4_6YYjlLE4X8",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBFLmZ4QXBpVmlkXzI4",
+      "snippet": {
+        "publishedAt": "2024-08-08T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0E",
+        "title": "A synthesizer made of keyboard shortcuts",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_28/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_28/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_28/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Music",
+        "playlistId": "UUfixtureParensChannel0E",
+        "position": 0,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_28"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Music",
+        "videoOwnerChannelId": "UCfixtureParensChannel0E"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_28",
+        "videoPublishedAt": "2024-08-08T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "A3fYz2gMBlDSLdIyxZZ3Xzb4e1o",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBFLmZ4QXBpVmlkXzI5",
+      "snippet": {
+        "publishedAt": "2023-07-07T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0E",
+        "title": "Piano: Prelude in parentheses",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_29/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_29/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_29/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Music",
+        "playlistId": "UUfixtureParensChannel0E",
+        "position": 1,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_29"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Music",
+        "videoOwnerChannelId": "UCfixtureParensChannel0E"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_29",
+        "videoPublishedAt": "2023-07-07T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "SOz6w2sCBIgiaD8Wv_Y5n_hPfL4",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBFLmZ4QXBpVmlkXzMw",
+      "snippet": {
+        "publishedAt": "2022-09-09T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0E",
+        "title": "Choir of keyboard clicks",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_30/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_30/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_30/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Music",
+        "playlistId": "UUfixtureParensChannel0E",
+        "position": 2,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_30"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Music",
+        "videoOwnerChannelId": "UCfixtureParensChannel0E"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_30",
+        "videoPublishedAt": "2022-09-09T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "or8xQnJHd06YIPE7E6VE_9iYV1I",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBFLmZ4QXBpVmlkXzMx",
+      "snippet": {
+        "publishedAt": "2021-12-12T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0E",
+        "title": "Drum machine in a spreadsheet",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_31/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_31/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_31/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Music",
+        "playlistId": "UUfixtureParensChannel0E",
+        "position": 3,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_31"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Music",
+        "videoOwnerChannelId": "UCfixtureParensChannel0E"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_31",
+        "videoPublishedAt": "2021-12-12T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "nwsch2ZvwH2zXepsKz30rrSnB8U",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBFLmZ4QXBpVmlkXzMy",
+      "snippet": {
+        "publishedAt": "2020-12-20T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0E",
+        "title": "Ambient loop for long builds",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_32/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_32/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_32/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Music",
+        "playlistId": "UUfixtureParensChannel0E",
+        "position": 4,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_32"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Music",
+        "videoOwnerChannelId": "UCfixtureParensChannel0E"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_32",
+        "videoPublishedAt": "2020-12-20T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    },
+    {
+      "kind": "youtube#playlistItem",
+      "etag": "BRUlNyH04ev9dvirmOBjTKBEg9c",
+      "id": "VVVmaXh0dXJlUGFyZW5zQ2hhbm5lbDBFLmZ4QXBpVmlkXzI3",
+      "snippet": {
+        "publishedAt": "2020-05-05T12:00:00Z",
+        "channelId": "UCfixtureParensChannel0E",
+        "title": "Lo-fi beats to refactor to",
+        "description": "A made-up video for the Parens browser test: no such video exists.",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_27/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_27/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/fxApiVid_27/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Quote Unquote Music",
+        "playlistId": "UUfixtureParensChannel0E",
+        "position": 5,
+        "resourceId": {
+          "kind": "youtube#video",
+          "videoId": "fxApiVid_27"
+        },
+        "videoOwnerChannelTitle": "Quote Unquote Music",
+        "videoOwnerChannelId": "UCfixtureParensChannel0E"
+      },
+      "contentDetails": {
+        "videoId": "fxApiVid_27",
+        "videoPublishedAt": "2020-05-05T12:00:00Z"
+      },
+      "status": {
+        "privacyStatus": "public"
+      }
+    }
+  ],
+  "pageInfo": {
+    "totalResults": 34,
+    "resultsPerPage": 34
+  }
+}

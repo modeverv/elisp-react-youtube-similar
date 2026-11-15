@@ -25,8 +25,9 @@
       // elisp-react lets Lisp change the DOM and hear events of the elements
       // it rendered, and nothing more.  This script does what Lisp cannot:
       // the address (#/watch?v=...), keys pressed anywhere, the title, the
-      // clipboard, the YouTube player and "the end of the list is in view".
-      // It holds no logic of the application: it passes messages.
+      // clipboard, the YouTube player, "the end of the list is in view", the
+      // width of the window, and keeping the keyboard inside a dialog.  It
+      // holds no logic of the application: it passes messages.
       //
       // It is inline because elisp-studio's preview keeps inline scripts but
       // cannot load a script of the project by its URL.
@@ -38,6 +39,7 @@
         const address = () => (studio ? studioUrl : location.hash || "#/");
         let input = null;   // #parens-port-in, once Lisp has rendered it
         let done = 0;       // the number of the last command carried out
+        const narrow = matchMedia("(max-width: 1000px)");
 
         // A message for Lisp: the value of the hidden input, and an "input" event.
         const send = (message) => {
@@ -47,8 +49,10 @@
         };
         const hello = () => send({
           type: "hello", url: address(), origin: self.origin, studio,
+          isolated: Boolean(self.crossOriginIsolated), narrow: narrow.matches,
           light: matchMedia("(prefers-color-scheme: light)").matches,
         });
+        narrow.addEventListener("change", () => send({ type: "media", narrow: narrow.matches }));
 
         // ---- the YouTube player: the IFrame API on the iframe Lisp made ----
         let youTube = null;
@@ -72,10 +76,7 @@
           }));
         });
         const player = () => {
-          for (const [frame, found] of players) {
-            if (frame.isConnected) return found;
-            players.delete(frame);
-          }
+          for (const [frame, found] of players) if (frame.isConnected) return found;
           return null;
         };
 
@@ -85,6 +86,21 @@
             if (entry.isIntersecting) send({ type: "near-end", name: entry.target.dataset.sentinel });
           }
         }, { rootMargin: "800px" });
+
+        // ---- dialogs: focus goes in, stays in, and comes back ----
+        let opener = null;
+        const dialog = () => document.querySelector('[role="dialog"]');
+        const background = () => document.querySelectorAll(".topbar, .layout");
+        const dialogOpened = (element) => {
+          opener = document.activeElement;
+          for (const part of background()) part.inert = true;
+          if (!element.contains(document.activeElement)) element.querySelector("button, input, a[href]")?.focus();
+        };
+        const dialogClosed = () => {
+          for (const part of background()) part.inert = false;
+          if (opener?.isConnected) opener.focus();
+          opener = null;
+        };
 
         // ---- what Lisp asks for (parens-port-send) ----
         const commands = {
@@ -111,39 +127,55 @@
             }
           },
         };
-        const run = (element) => {
-          const seq = Number(element.dataset.seq);
-          if (!(seq > done)) return false;
-          done = seq;
-          try {
-            const command = JSON.parse(element.dataset.cmd);
-            commands[command.cmd]?.(command);
-          } catch (error) {
-            console.error("[parens-port]", error);
+        // Carry out every command not done yet, in the order of their numbers.
+        const runCommands = () => {
+          const pending = [...document.querySelectorAll("#parens-port > data")]
+            .map((element) => [Number(element.dataset.seq), element])
+            .filter(([seq]) => seq > done)
+            .sort((a, b) => a[0] - b[0]);
+          for (const [seq, element] of pending) {
+            done = seq;
+            try {
+              const command = JSON.parse(element.dataset.cmd);
+              commands[command.cmd]?.(command);
+            } catch (error) {
+              console.error("[parens-port]", error);
+            }
           }
-          return true;
+          if (pending.length) send({ type: "ack", seq: done });
         };
 
         // Everything Lisp puts on the page passes here.
+        const watched = "#parens-port-in, #parens-port > data, [data-sentinel], iframe[data-player], [role=dialog]";
         new MutationObserver((records) => {
-          let ran = false;
+          let commandsCame = false;
           for (const record of records) {
             for (const node of record.addedNodes) {
               if (node.nodeType !== 1) continue;
-              for (const element of [node, ...node.querySelectorAll("#parens-port-in, #parens-port > data, [data-sentinel], iframe[data-player]")]) {
+              for (const element of [node, ...node.querySelectorAll(watched)]) {
                 if (element.id === "parens-port-in") {
                   if (element !== input) { input = element; hello(); }
                 } else if (element.matches("#parens-port > data")) {
-                  ran = run(element) || ran;
+                  commandsCame = true;
                 } else if (element.matches("[data-sentinel]")) {
                   watcher.observe(element);
                 } else if (element.matches("iframe[data-player]")) {
                   attachPlayer(element);
+                } else if (element.matches("[role=dialog]")) {
+                  dialogOpened(element);
                 }
               }
             }
+            for (const node of record.removedNodes) {
+              if (node.nodeType !== 1) continue;
+              for (const element of [node, ...node.querySelectorAll(watched)]) {
+                if (element.matches("[data-sentinel]")) watcher.unobserve(element);
+                else if (element.matches("iframe[data-player]")) players.delete(element);
+                else if (element.matches("[role=dialog]") && !dialog()) dialogClosed();
+              }
+            }
           }
-          if (ran) send({ type: "ack", seq: done });
+          if (commandsCame) runCommands();
         }).observe(document.body, { childList: true, subtree: true });
 
         // ---- what the visitor does outside Lisp's elements ----
@@ -159,11 +191,24 @@
           studioUrl = link.getAttribute("href");
           send({ type: "route", url: studioUrl });
         }, true);
+
         // For the console and the tests: talk to Lisp, reach the player.
         window.parensPort = Object.freeze({ send, player, address });
 
         const KEYS = new Set(["/", "?", "Escape", "k", "j", "l"]);
         document.addEventListener("keydown", (event) => {
+          // Tab stays inside an open dialog (Lisp cannot stop the key in time).
+          const open = dialog();
+          if (open && event.key === "Tab") {
+            const stops = [...open.querySelectorAll("button, input, select, textarea, a[href], [tabindex]")]
+              .filter((element) => !element.disabled && element.tabIndex >= 0);
+            const first = stops[0], last = stops[stops.length - 1];
+            if (event.shiftKey ? document.activeElement === first : document.activeElement === last) {
+              event.preventDefault();
+              (event.shiftKey ? last : first)?.focus();
+            }
+            return;
+          }
           if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing || !KEYS.has(event.key)) return;
           const field = Boolean(event.target.closest?.("input, textarea, select, [contenteditable]"));
           if (field && event.key !== "Escape") return;

@@ -30,7 +30,13 @@
 
 (defvar parens-mode nil
   "Where the data comes from: `api', `server' or `curated'; nil until known.")
-(defvar parens-mode-note nil "Why the mode is not the richer one: a sentence, or nil.")
+(defvar parens-mode-note nil
+  "Why the mode is not the richer one: the failure, or nil.
+`parens-mode-note-text' says it in words.")
+(defvar parens-generation 0
+  "Changes whenever the source changes (a key saved or removed): answers to
+requests made before belong to an old source and are dropped.  The pages
+get it as a prop and load again when it changes.")
 (defvar parens-api-key nil "The visitor's YouTube Data API key, or nil.")
 (defvar parens-videos (make-hash-table :test #'equal) "Video id -> what is known about it.")
 (defvar parens-channels (make-hash-table :test #'equal) "Channel id -> what is known about it.")
@@ -80,7 +86,17 @@ The plist kept is a new one, so `:pure' cards see the change."
   "Forget all videos, channels and the catalogue (the source changed)."
   (clrhash parens-videos)
   (clrhash parens-channels)
-  (setq parens-catalogue nil parens-catalogue-status nil parens-mode-note nil))
+  (setq parens-generation (1+ parens-generation)
+        parens-catalogue nil parens-catalogue-status nil parens-catalogue-waiting nil
+        parens-mode-note nil))
+
+(defun parens-mode-note-text ()
+  "Why the mode is not the richer one, in `parens-lang', or nil."
+  (and parens-mode-note (parens-t 'fallback (parens-failure-text parens-mode-note))))
+
+(defun parens-stale-p (generation)
+  "Non-nil if GENERATION is not the current source's."
+  (/= generation parens-generation))
 
 ;;;; Waiting
 
@@ -127,13 +143,22 @@ Its value is the list of their values; nil for one that failed."
 (defun parens-failure-text (failure)
   "A sentence for the visitor about FAILURE."
   (let ((reason (parens--reason failure)))
+    ;; The Data API's messages contain HTML (<code>playlistId</code>).
+    (when (and (consp reason) (keywordp (car reason)) (stringp (plist-get reason :message)))
+      (setq reason (react-plist-with reason :message
+                                     (replace-regexp-in-string "<[^>]*>" "" (plist-get reason :message)))))
     (cond ((and (consp reason) (keywordp (car reason)))
            (pcase (plist-get reason :reason)
              ((or "quotaExceeded" "dailyLimitExceeded" "rateLimitExceeded") (parens-t 'quota))
              ("videoChartNotFound" (parens-t 'chart-missing))
              ("commentsDisabled" (parens-t 'comments-off))
-             (_ (parens-t 'error (or (plist-get reason :message)
-                                     (format "HTTP %s" (plist-get reason :status)))))))
+             (_ (if (memql (plist-get reason :status) '(401 403 404))
+                    ;; oEmbed: 404 for no such video, 401/403 for a private one.
+                    (if (plist-get reason :reason)
+                        (parens-t 'error (plist-get reason :message))
+                      (parens-t 'not-found))
+                  (parens-t 'error (or (plist-get reason :message)
+                                       (format "HTTP %s" (plist-get reason :status))))))))
           ((stringp reason) (parens-t 'error reason))
           ((and (consp reason) (symbolp (car reason)))
            (parens-t 'error (error-message-string reason)))
@@ -214,15 +239,18 @@ Parameters whose value is nil are left out."
          (status (plist-get item :status))
          (id (plist-get item :id)))
     (list :id id
-          :title (plist-get snippet :title)
+          ;; hl= translates only `localized', not the title itself.
+          :title (or (plist-get (plist-get snippet :localized) :title) (plist-get snippet :title))
           :channel-id (plist-get snippet :channelId)
           :channel (plist-get snippet :channelTitle)
           :published (plist-get snippet :publishedAt)
-          :description (plist-get snippet :description)
+          :description (or (plist-get (plist-get snippet :localized) :description) (plist-get snippet :description))
           :thumbnail (or (plist-get (plist-get (plist-get snippet :thumbnails) :medium) :url)
                          (parens-thumbnail-url id))
           :category (plist-get snippet :categoryId)
-          :live (and (member (plist-get snippet :liveBroadcastContent) '("live" "upcoming")) t)
+          :live (pcase (plist-get snippet :liveBroadcastContent)
+                  ("live" 'live)
+                  ("upcoming" 'upcoming))
           :views (parens-number (plist-get statistics :viewCount))
           :likes (parens-number (plist-get statistics :likeCount))
           :comment-count (parens-number (plist-get statistics :commentCount))
@@ -325,14 +353,17 @@ A failure here only costs pictures: it is ignored."
 (defun parens-catalogue-load ()
   "An awaitable: ask server.el for the feeds, or else take the curated list."
   (parens-async
-    (let ((answer (condition-case failure
-                      (react-await (parens-lisp-request "api/feed"))
-                    (error
-                     ;; A static site has no server (404): that is the curated mode,
-                     ;; not a problem.  Anything else is worth saying.
-                     (unless (eql (parens-failure-status failure) 404)
-                       (setq parens-mode-note (parens-t 'fallback (parens-failure-text failure))))
-                     nil))))
+    (let* ((generation parens-generation)
+           (problem nil)
+           (answer (condition-case failure
+                       (react-await (parens-lisp-request "api/feed"))
+                     (error (setq problem failure) nil))))
+      ;; A key was saved meanwhile: this answer is for a source that is gone.
+      (when (parens-stale-p generation) (error "Stale"))
+      ;; A static site has no server (404): that is the curated mode, not a
+      ;; problem.  Anything else is worth saying.
+      (when (and problem (not (eql (parens-failure-status problem) 404)))
+        (setq parens-mode-note problem))
       (if (plist-get answer :videos)
           (progn
             (setq parens-mode 'server)
@@ -444,7 +475,10 @@ FILTER is a category id (`api') or a topic (the others), nil for all."
       ;; uploads and the chart of the video's category stand in.  Either
       ;; may fail (no chart for a category): what there is is shown.
       (let* ((video (parens-video id))
-             (uploads (plist-get (parens-channel (plist-get video :channel-id)) :uploads))
+             (known (or (plist-get (parens-channel (plist-get video :channel-id)) :uploads)
+                        ;; Reached by its address, the channel may not be known yet.
+                        (react-await (parens-api-fill-channels (list (plist-get video :channel-id))))))
+             (uploads (and known (plist-get (parens-channel (plist-get video :channel-id)) :uploads)))
              (from-channel (and uploads
                                 (condition-case nil
                                     (react-await (parens-api-playlist uploads 12 nil))

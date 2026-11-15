@@ -32,6 +32,8 @@ A copy: the studio's server Emacs has server.el only, not the application's file
 (defvar parens-server-waiting nil
   "(RESPOND . FAIL) of the requests waiting for the reading in progress, or nil.")
 (defvar parens-server-reading nil "Non-nil while the feeds are being read.")
+(defvar parens-server-round 0 "The number of the latest reading; older answers are dropped.")
+(defconst parens-server-deadline 20 "Seconds a reading may take; then what has come is used.")
 
 (defun parens-server--text (node)
   (let ((text (car (xml-node-children node))))
@@ -76,39 +78,51 @@ A copy: the studio's server Emacs has server.el only, not the application's file
       (if ok (funcall (car pair) value) (funcall (cdr pair) value 502)))))
 
 (defun parens-server-read-feeds ()
-  "Read every channel's feed at once; settle the waiting requests when all answered."
+  "Read every channel's feed at once; settle the waiting requests when all
+have answered, or after `parens-server-deadline' with what has come.
+A feed that fails, even at once (no network: url-retrieve signals), counts
+as answered, so a reading always ends."
   (setq parens-server-reading t)
-  (let ((left (length parens-server-channels))
-        (found nil) (channels nil) (errors nil))
+  (let* ((round (setq parens-server-round (1+ parens-server-round)))
+         (left (length parens-server-channels))
+         (found nil) (channels nil) (errors nil)
+         (finish
+          (lambda ()
+            ;; Once per reading: the last answer or the deadline, whichever first.
+            (when (and parens-server-reading (= round parens-server-round))
+              (if (null found)
+                  (parens-server--settle nil (format "no feed could be read: %s"
+                                                     (or (cdr (car errors)) "no answer in time")))
+                (let ((answer (list :videos (sort (copy-sequence found)
+                                                  (lambda (a b) (string> (plist-get a :published)
+                                                                         (plist-get b :published))))
+                                    :channels channels
+                                    :errors errors)))
+                  (setq parens-server-cache (cons (float-time) answer))
+                  (parens-server--settle t answer))))))
+         (done (lambda () (when (zerop (setq left (1- left))) (funcall finish)))))
+    (app-server-after parens-server-deadline finish)
     (dolist (channel parens-server-channels)
-      (let ((done (lambda ()
-                    (when (zerop (setq left (1- left)))
-                      (if (null found)
-                          (parens-server--settle nil (format "no feed could be read: %s"
-                                                             (cdr (car errors))))
-                        (let ((answer (list :videos (sort found (lambda (a b) (string> (plist-get a :published)
-                                                                                         (plist-get b :published))))
-                                            :channels channels
-                                            :errors errors)))
-                          (setq parens-server-cache (cons (float-time) answer))
-                          (parens-server--settle t answer)))))))
-        (app-server-fetch
-         (concat "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF" (substring channel 2))
-         :then (lambda (response)
-                 (condition-case err
-                     (if (not (plist-get response :ok))
-                         (push (cons channel (format "HTTP %s" (plist-get response :status))) errors)
-                       (let ((videos (parens-server-entries (plist-get response :text))))
-                         (setq found (append found videos))
-                         (when videos
-                           (push (list :id channel :title (plist-get (car videos) :channel)
-                                       :url (plist-get (car videos) :channel-url))
-                                 channels))))
-                   (error (push (cons channel (error-message-string err)) errors)))
-                 (funcall done))
-         :catch (lambda (message)
-                  (push (cons channel (format "fetch failed: %s" message)) errors)
-                  (funcall done)))))))
+      (condition-case err
+          (app-server-fetch
+           (concat "https://www.youtube.com/feeds/videos.xml?playlist_id=UULF" (substring channel 2))
+           :then (lambda (response)
+                   (condition-case err
+                       (if (not (plist-get response :ok))
+                           (push (cons channel (format "HTTP %s" (plist-get response :status))) errors)
+                         (let ((videos (parens-server-entries (plist-get response :text))))
+                           (setq found (append found videos))
+                           (when videos
+                             (push (list :id channel :title (plist-get (car videos) :channel)
+                                         :url (plist-get (car videos) :channel-url))
+                                   channels))))
+                     (error (push (cons channel (error-message-string err)) errors)))
+                   (funcall done))
+           :catch (lambda (message)
+                    (push (cons channel (format "fetch failed: %s" message)) errors)
+                    (funcall done)))
+        (error (push (cons channel (error-message-string err)) errors)
+               (funcall done))))))
 
 (defun parens-server-feed ()
   "The answer to /api/feed: at once from the cache, or later."

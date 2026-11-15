@@ -18,7 +18,8 @@
   (lambda (self)
     (jsx (header (:class "topbar")
            (div (:class "topbar-start")
-             (button (:class "icon-button" :type "button" :aria-label "Menu"
+             (button (:class "icon-button" :type "button" :aria-label (parens-t 'menu)
+                      :aria-expanded (if (react-props self :sidebar) "true" "false")
                       :on-click (lambda (_event) (parens-app-set :sidebar (not (parens-app-state :sidebar)))))
                (parens-icon "menu"))
              (a (:class "logo" :href "#/" :aria-label "Parens")
@@ -105,7 +106,7 @@
 (react-define-component 'App
   :initial-state
   (lambda (_props)
-    (let ((settings (parens--merge parens-default-settings (react-storage-get "parens/settings"))))
+    (let ((settings (parens-settings (react-storage-get "parens/settings"))))
       (setq parens-lang (plist-get settings :lang)
             parens-api-key (react-storage-get "parens/api-key")
             parens-mode (and parens-api-key 'api))
@@ -129,22 +130,24 @@
            (page (plist-get route :page))
            (dialog (react-state self :dialog)))
       (jsx (div (:class (parens-class "app" (format "theme-%s" (plist-get (react-state self :settings) :theme))
+                                      (format "page-%s" (or page 'none))
                                       (and (react-state self :sidebar) "sidebar-toggled"))
                  :lang (symbol-name parens-lang))
              (Port)
-             (Header (:query (and (eq page 'results) (plist-get route :q)) :mode parens-mode :lang parens-lang))
+             (Header (:query (and (eq page 'results) (plist-get route :q)) :mode parens-mode :lang parens-lang
+                      :sidebar (react-state self :sidebar)))
              (div (:class "layout")
                (parens-sidebar route)
-               (main (:class "content" :id "content")
-                 (and parens-mode-note (parens-note parens-mode-note "mode-note"))
+               (main (:class "content" :id "content" :ref "content" :tabindex "-1")
+                 (and parens-mode-note (parens-note (parens-mode-note-text) "mode-note"))
                  (pcase page
                    ('nil (parens-skeleton-grid 12))
-                   ('watch (jsx (WatchPage (:v (plist-get route :v) :t (plist-get route :t) :mode parens-mode))))
-                   ('results (jsx (ResultsPage (:q (plist-get route :q) :mode parens-mode))))
-                   ('channel (jsx (ChannelPage (:id (plist-get route :id) :mode parens-mode))))
+                   ('watch (jsx (WatchPage (:v (plist-get route :v) :t (plist-get route :t) :mode parens-mode :generation parens-generation))))
+                   ('results (jsx (ResultsPage (:q (plist-get route :q) :mode parens-mode :generation parens-generation))))
+                   ('channel (jsx (ChannelPage (:id (plist-get route :id) :mode parens-mode :generation parens-generation))))
                    ('history (jsx (LibraryPage (:kind 'history :entries (react-state self :history)))))
                    ('later (jsx (LibraryPage (:kind 'later :entries (react-state self :later)))))
-                   (_ (jsx (HomePage (:mode parens-mode)))))))
+                   (_ (jsx (HomePage (:mode parens-mode :generation parens-generation :lang parens-lang)))))))
              ;; The backdrop is beside the dialog, not around it: a click
              ;; inside the dialog would reach a parent's handler too (Lisp
              ;; cannot stop an event, nor tell where it started).
@@ -152,8 +155,10 @@
              (pcase dialog
                ('settings (jsx (SettingsDialog)))
                ('shortcuts (jsx (ShortcutsDialog))))
-             (and (react-state self :toast)
-                  (jsx (div (:class "toast" :role "status") (react-state self :toast)))))))))
+             ;; The live region is always there: one that appears together
+             ;; with its text may not be read out.
+             (div (:class (parens-class "toast" (and (react-state self :toast) "shown")) :role "status")
+               (or (react-state self :toast) "")))))))
 
 ;;;; Messages from the page
 
@@ -162,15 +167,26 @@
  (lambda (message)
    ;; The first message: where the page is, and whether it is a preview.
    (setq parens-origin (plist-get message :origin)
-         parens-studio (plist-get message :studio))
+         parens-studio (plist-get message :studio)
+         parens-isolated (plist-get message :isolated)
+         parens-narrow (plist-get message :narrow))
    (when (and (plist-get message :light) (not (react-storage-get "parens/settings")))
      (parens-set-setting :theme 'light))
    (parens-show (or (and parens-studio (react-storage-get "parens/studio-route"))
-                    (parens-route-parse (plist-get message :url))))))
+                    (parens-route-parse (plist-get message :url))))
+   ;; Globals changed (there is no context to carry them): render again.
+   (parens-changed)))
 
 (parens-port-on "route" (lambda (message) (parens-show (parens-route-parse (plist-get message :url)))))
 
-(parens-port-on "near-end" (lambda (_message) (when parens-near-end-function (funcall parens-near-end-function))))
+(parens-port-on "media" (lambda (message) (setq parens-narrow (plist-get message :narrow)) (parens-changed)))
+
+(parens-port-on "near-end"
+                (lambda (message)
+                  ;; A late message from a list that is gone is not for this page.
+                  (when (and parens-near-end-function
+                             (equal (plist-get message :name) (car parens-near-end-function)))
+                    (funcall (cdr parens-near-end-function)))))
 
 (parens-port-on "copied" (lambda (message) (parens-toast (parens-t (if (plist-get message :ok) 'copied 'copy-failed)))))
 
@@ -199,9 +215,13 @@
      ("?" (parens-open-dialog 'shortcuts))
      ("Escape" (cond ((parens-app-state :dialog) (parens-close-dialog))
                      ((and (plist-get message :field) parens-header) (react-invoke parens-header "search" "blur"))))
-     ("k" (when parens-watch-page (parens-port-send "player" :func "toggle")))
-     ("j" (when parens-watch-page (parens-port-send "player" :func "seekBy" :args [-10])))
-     ("l" (when parens-watch-page (parens-port-send "player" :func "seekBy" :args [10]))))))
+     ;; The player's keys, unless a dialog is open.
+     ("k" (when (and parens-watch-page (not (parens-app-state :dialog)))
+            (parens-port-send "player" :func "toggle")))
+     ("j" (when (and parens-watch-page (not (parens-app-state :dialog)))
+            (parens-port-send "player" :func "seekBy" :args [-10])))
+     ("l" (when (and parens-watch-page (not (parens-app-state :dialog)))
+            (parens-port-send "player" :func "seekBy" :args [10]))))))
 
 (react-mount (jsx (App)) "#app")
 

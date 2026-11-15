@@ -32,7 +32,8 @@ draw."
     (jsx (span (:class (parens-class "thumb" (and wide "wide")))
            (img (:src (or (plist-get video :thumbnail) (parens-thumbnail-url (plist-get video :id)))
                  :alt "" :loading "lazy" :width "320" :height "180"))
-           (cond ((plist-get video :live) (jsx (span (:class "badge live") (parens-t 'live))))
+           (cond ((eq (plist-get video :live) 'live) (jsx (span (:class "badge live") (parens-t 'live))))
+                 ((plist-get video :live) (jsx (span (:class "badge") (parens-t 'upcoming))))
                  (duration (jsx (span (:class "badge") duration))))))))
 
 (defun parens-meta (video)
@@ -131,12 +132,12 @@ draw."
 
 (defun parens-chips (chips selected on-select)
   "A row of CHIPS ((VALUE . LABEL) ...); ON-SELECT gets the VALUE."
-  (jsx (div (:class "chips" :role "tablist")
+  (jsx (div (:class "chips" :role "group")
          (mapcar (lambda (chip)
                    (let ((chosen (equal (car chip) selected)))
-                     (jsx (button (:key (format "%s" (car chip)) :type "button" :role "tab"
+                     (jsx (button (:key (format "%s" (car chip)) :type "button"
                                    :class (parens-class "chip" (and chosen "selected"))
-                                   :aria-selected (if chosen "true" "false")
+                                   :aria-pressed (if chosen "true" "false")
                                    :on-click (lambda (_event) (funcall on-select (car chip))))
                             (cdr chip)))))
                  chips))))

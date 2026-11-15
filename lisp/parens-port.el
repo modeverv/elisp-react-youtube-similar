@@ -11,13 +11,16 @@
 ;;   component renders: the script puts a message (JSON) into its value and
 ;;   fires an "input" event, which reaches `parens-port--receive'.
 ;; - Lisp talks to the page by rendering one <data> element per command
-;;   (JSON in data-cmd).  The script sees it appear, carries it out, and
-;;   answers {"type":"ack","seq":N}; the element then goes away.
+;;   (JSON in data-cmd).  The script sees them appear, carries out the new
+;;   ones in the order of their numbers (data-seq), and answers
+;;   {"type":"ack","seq":N}; the elements then go away.  (Several new
+;;   elements come in one batch, and not in the order they were made:
+;;   elisp-react inserts new keyed children last first.)
 
 (require 'seq)
 
 (defvar parens-port--outbox nil
-  "Commands the page has not acknowledged: ((SEQ . PLIST) ...), oldest first.")
+  "Commands the page has not acknowledged: ((SEQ . JSON) ...), oldest first.")
 (defvar parens-port--seq 0 "The number of the last command.")
 (defvar parens-port--instance nil "The mounted `Port'.")
 (defvar parens-origin nil
@@ -25,6 +28,9 @@
 The player wants it (origin=) to talk to the page.")
 (defvar parens-studio nil
   "Non-nil in elisp-studio's preview: a srcdoc frame, without an address.")
+(defvar parens-isolated nil
+  "Non-nil when the page is cross-origin isolated (elisp-studio's preview):
+a frame of another site then needs the credentialless attribute.")
 
 (defvar parens-port-listeners nil
   "What to do with a message from the page: an alist (TYPE . FUNCTION).
@@ -36,14 +42,19 @@ TYPE is the message's \"type\" (a string); FUNCTION gets the message, a plist.")
 
 (defun parens-port-send (command &rest arguments)
   "Ask the page to carry out COMMAND (a string) with ARGUMENTS (a plist).
-The commands are in index.html: navigate, back, title, scroll-top, copy,
-player.  Values must be JSON: strings, numbers, t, :false, vectors."
-  (setq parens-port--seq (1+ parens-port--seq))
-  (setq parens-port--outbox
-        (append parens-port--outbox
-                (list (cons parens-port--seq (append (list :cmd command) arguments)))))
-  (when parens-port--instance
-    (react-set-state parens-port--instance :seq parens-port--seq))
+The commands are in index.html: navigate, title, scroll-top, copy,
+player.  Values must be JSON: strings, numbers, t, :false, vectors.  A
+command that cannot be written as JSON is dropped (and said so) here,
+not left in the outbox to break every later render."
+  (let ((json (condition-case failure
+                  (parens-json (append (list :cmd command) arguments))
+                (error (message "parens-port: %s cannot be sent: %S" command failure)
+                       nil))))
+    (when json
+      (setq parens-port--seq (1+ parens-port--seq))
+      (setq parens-port--outbox (append parens-port--outbox (list (cons parens-port--seq json))))
+      (when parens-port--instance
+        (react-set-state parens-port--instance :seq parens-port--seq))))
   nil)
 
 (defun parens-port--receive (text)
@@ -72,7 +83,7 @@ player.  Values must be JSON: strings, numbers, t, :false, vectors."
            (input (:id "parens-port-in" :type "hidden"
                    :on-input (lambda (event) (parens-port--receive (plist-get event :value)))))
            (mapcar (lambda (item)
-                     (jsx (data (:key (car item) :data-seq (car item) :data-cmd (parens-json (cdr item))))))
+                     (jsx (data (:key (car item) :data-seq (car item) :data-cmd (cdr item)))))
                    parens-port--outbox)))))
 
 (provide 'parens-port)

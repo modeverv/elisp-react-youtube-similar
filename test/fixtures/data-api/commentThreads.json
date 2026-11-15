@@ -1,0 +1,146 @@
+{
+  "kind": "youtube#commentThreadListResponse",
+  "etag": "rEmLxWAwClzympAv7RdviUDsSYE",
+  "pageInfo": {
+    "totalResults": 4,
+    "resultsPerPage": 4
+  },
+  "items": [
+    {
+      "kind": "youtube#commentThread",
+      "etag": "AFtTtr4QHfiOH6ifGMu0w42bsXA",
+      "id": "UgxFixtureThread01Parens4AaABAg",
+      "snippet": {
+        "channelId": "UCfixtureParensChannel0A",
+        "videoId": "fxApiVid_02",
+        "topLevelComment": {
+          "kind": "youtube#comment",
+          "etag": "Uaq-b1HFbuJ5BBaCXwofGUPi8o4",
+          "id": "UgxFixtureThread01Parens4AaABAg",
+          "snippet": {
+            "channelId": "UCfixtureParensChannel0A",
+            "videoId": "fxApiVid_02",
+            "textDisplay": "The part at 1:23 made it click for me. My notes: https://example.com/lisp-notes",
+            "textOriginal": "The part at 1:23 made it click for me. My notes: https://example.com/lisp-notes",
+            "authorDisplayName": "@lisp_fan",
+            "authorProfileImageUrl": "https://yt3.ggpht.com/ytc/fixture-viewer-1=s48-c-k-c0x00ffffff-no-rj",
+            "authorChannelUrl": "http://www.youtube.com/@lisp_fan",
+            "authorChannelId": {
+              "value": "UCfixtureViewer0000001"
+            },
+            "canRate": true,
+            "viewerRating": "none",
+            "likeCount": 120,
+            "publishedAt": "2024-03-06T08:00:00Z",
+            "updatedAt": "2024-03-06T08:00:00Z"
+          }
+        },
+        "canReply": true,
+        "totalReplyCount": 2,
+        "isPublic": true
+      }
+    },
+    {
+      "kind": "youtube#commentThread",
+      "etag": "_XKzKYl0nrY2hp6Xc2mlh3WAtXA",
+      "id": "UgxFixtureThread02Parens4AaABAg",
+      "snippet": {
+        "channelId": "UCfixtureParensChannel0A",
+        "videoId": "fxApiVid_02",
+        "topLevelComment": {
+          "kind": "youtube#comment",
+          "etag": "YTAMFsCknkDisApMUZC92P2Vk4k",
+          "id": "UgxFixtureThread02Parens4AaABAg",
+          "snippet": {
+            "channelId": "UCfixtureParensChannel0A",
+            "videoId": "fxApiVid_02",
+            "textDisplay": "括弧が多いほど落ち着きます。",
+            "textOriginal": "括弧が多いほど落ち着きます。",
+            "authorDisplayName": "@quiet_reader",
+            "authorProfileImageUrl": "https://yt3.ggpht.com/ytc/fixture-viewer-2=s48-c-k-c0x00ffffff-no-rj",
+            "authorChannelUrl": "http://www.youtube.com/@quiet_reader",
+            "authorChannelId": {
+              "value": "UCfixtureViewer0000002"
+            },
+            "canRate": true,
+            "viewerRating": "none",
+            "likeCount": 8,
+            "publishedAt": "2024-04-01T12:30:00Z",
+            "updatedAt": "2024-04-01T12:30:00Z"
+          }
+        },
+        "canReply": true,
+        "totalReplyCount": 0,
+        "isPublic": true
+      }
+    },
+    {
+      "kind": "youtube#commentThread",
+      "etag": "uD1SQPGxD8ggjcjQn-2T_PuyEFE",
+      "id": "UgxFixtureThread03Parens4AaABAg",
+      "snippet": {
+        "channelId": "UCfixtureParensChannel0A",
+        "videoId": "fxApiVid_02",
+        "topLevelComment": {
+          "kind": "youtube#comment",
+          "etag": "UldUZhQSjCF7-GDKv7WltNGP5YI",
+          "id": "UgxFixtureThread03Parens4AaABAg",
+          "snippet": {
+            "channelId": "UCfixtureParensChannel0A",
+            "videoId": "fxApiVid_02",
+            "textDisplay": "Could you cover macros next?",
+            "textOriginal": "Could you cover macros next?",
+            "authorDisplayName": "@another_viewer",
+            "authorProfileImageUrl": "https://yt3.ggpht.com/ytc/fixture-viewer-3=s48-c-k-c0x00ffffff-no-rj",
+            "authorChannelUrl": "http://www.youtube.com/@another_viewer",
+            "authorChannelId": {
+              "value": "UCfixtureViewer0000003"
+            },
+            "canRate": true,
+            "viewerRating": "none",
+            "likeCount": 0,
+            "publishedAt": "2025-01-15T20:00:00Z",
+            "updatedAt": "2025-01-15T20:00:00Z"
+          }
+        },
+        "canReply": true,
+        "totalReplyCount": 1,
+        "isPublic": true
+      }
+    },
+    {
+      "kind": "youtube#commentThread",
+      "etag": "p0btAUH9KMKugsK78ZvlMJWae64",
+      "id": "UgxFixtureThread04Parens4AaABAg",
+      "snippet": {
+        "channelId": "UCfixtureParensChannel0B",
+        "videoId": "fxApiVid_01",
+        "topLevelComment": {
+          "kind": "youtube#comment",
+          "etag": "AzFNkoFqt6sGbjrosgV_7DKEFP0",
+          "id": "UgxFixtureThread04Parens4AaABAg",
+          "snippet": {
+            "channelId": "UCfixtureParensChannel0B",
+            "videoId": "fxApiVid_01",
+            "textDisplay": "I never knew that.",
+            "textOriginal": "I never knew that.",
+            "authorDisplayName": "@rainbow_watcher",
+            "authorProfileImageUrl": "https://yt3.ggpht.com/ytc/fixture-viewer-4=s48-c-k-c0x00ffffff-no-rj",
+            "authorChannelUrl": "http://www.youtube.com/@rainbow_watcher",
+            "authorChannelId": {
+              "value": "UCfixtureViewer0000004"
+            },
+            "canRate": true,
+            "viewerRating": "none",
+            "likeCount": 5,
+            "publishedAt": "2023-06-11T09:00:00Z",
+            "updatedAt": "2023-06-11T09:00:00Z"
+          }
+        },
+        "canReply": true,
+        "totalReplyCount": 0,
+        "isPublic": true
+      }
+    }
+  ]
+}

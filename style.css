@@ -49,11 +49,11 @@ img { display: block; }
 .topbar-start, .topbar-end { display: flex; align-items: center; gap: 8px; flex: none; }
 .logo { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 19px; letter-spacing: -0.3px; }
 .logo-mark { color: var(--accent); font-size: 17px; }
-.search { flex: 1; max-width: 640px; margin: 0 auto; display: flex; }
-.search input { flex: 1; min-width: 0; height: 40px; padding: 0 16px; border: 1px solid var(--line); border-right: 0;
+.search { flex: 1; min-width: 0; max-width: 640px; margin: 0 auto; display: flex; }
+.search input { flex: 1; min-width: 0; width: 0; height: 40px; padding: 0 16px; border: 1px solid var(--line); border-right: 0;
                 border-radius: 20px 0 0 20px; background: var(--bg); color: var(--text); font: inherit; font-size: 16px; }
 .search input:focus { outline: none; border-color: var(--accent); }
-.search-button { width: 64px; height: 40px; border: 1px solid var(--line); border-radius: 0 20px 20px 0;
+.search-button { width: 64px; flex: none; height: 40px; border: 1px solid var(--line); border-radius: 0 20px 20px 0;
                  background: var(--surface); display: grid; place-items: center; cursor: pointer; }
 .icon-button { width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent;
                display: grid; place-items: center; cursor: pointer; }
@@ -77,6 +77,10 @@ img { display: block; }
 .sidebar-footer a { color: var(--muted); text-decoration: underline; }
 .content { flex: 1; min-width: 0; padding: 8px 24px 48px; }
 .app.sidebar-toggled .sidebar { display: none; }
+/* On a watch page, and on narrow windows, the sidebar is a drawer over the page. */
+.app.page-watch .sidebar { display: none; }
+.app.page-watch.sidebar-toggled .sidebar { display: block; position: fixed; left: 0; top: 56px; z-index: 30;
+                                           background: var(--bg); box-shadow: 0 0 24px rgba(0, 0, 0, .4); }
 @media (max-width: 1000px) {
   .sidebar { display: none; }
   .app.sidebar-toggled .sidebar { display: block; position: fixed; left: 0; top: 56px; z-index: 30;
@@ -96,7 +100,7 @@ img { display: block; }
 .chip.selected { background: var(--chip-on); color: var(--chip-on-text); }
 
 /* ---- the grid of cards ---- */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px 16px; padding-top: 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 40px 16px; padding-top: 12px; }
 .card { min-width: 0; }
 .thumb { position: relative; display: block; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: var(--skeleton); }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -112,6 +116,7 @@ img { display: block; }
 .card-channel:hover { color: var(--text); }
 .card-later { position: absolute; right: -8px; top: -6px; width: 36px; height: 36px; opacity: 0; }
 .card:hover .card-later, .card-later:focus, .card-later.saved { opacity: 1; }
+@media (hover: none) { .card-later { opacity: 1; } }
 .card-later.saved { color: var(--accent); }
 .avatar { width: 36px; height: 36px; border-radius: 50%; flex: none; object-fit: cover; background: var(--skeleton); }
 .avatar.letter { display: grid; place-items: center; color: #fff; font-weight: 600; }
@@ -176,7 +181,7 @@ img { display: block; }
 .up-next { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .switch { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); cursor: pointer; }
 .switch input { accent-color: var(--accent); }
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
   .watch { flex-direction: column; }
   .watch-side { width: 100%; }
 }
@@ -226,3 +231,7 @@ kbd { display: inline-block; min-width: 24px; padding: 2px 8px; border: 1px soli
       background: var(--bg); font: 600 13px/1.4 ui-monospace, monospace; text-align: center; }
 .toast { position: fixed; left: 24px; bottom: 24px; z-index: 50; padding: 12px 20px; border-radius: 8px;
          background: var(--text); color: var(--bg); font-weight: 500; }
+/* Kept in the accessibility tree (a hidden live region would not be read out). */
+.toast:not(.shown) { opacity: 0; padding: 0; pointer-events: none; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.content:focus { outline: none; }

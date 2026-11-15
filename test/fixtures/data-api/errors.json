@@ -1,0 +1,89 @@
+{
+  "quotaExceeded": {
+    "error": {
+      "code": 403,
+      "message": "The request cannot be completed because you have exceeded your <a href=\"/youtube/v3/getting-started#quota\">quota</a>.",
+      "errors": [
+        {
+          "message": "The request cannot be completed because you have exceeded your <a href=\"/youtube/v3/getting-started#quota\">quota</a>.",
+          "domain": "youtube.quota",
+          "reason": "quotaExceeded"
+        }
+      ]
+    }
+  },
+  "videoChartNotFound": {
+    "error": {
+      "code": 404,
+      "message": "The requested video chart is not supported or is not available.",
+      "errors": [
+        {
+          "message": "The requested video chart is not supported or is not available.",
+          "domain": "youtube.video",
+          "reason": "videoChartNotFound",
+          "location": "chart",
+          "locationType": "parameter"
+        }
+      ]
+    }
+  },
+  "commentsDisabled": {
+    "error": {
+      "code": 403,
+      "message": "The video identified by the <code><a href=\"/youtube/v3/docs/commentThreads/list#videoId\">videoId</a></code> parameter has disabled comments.",
+      "errors": [
+        {
+          "message": "The video identified by the <code><a href=\"/youtube/v3/docs/commentThreads/list#videoId\">videoId</a></code> parameter has disabled comments.",
+          "domain": "youtube.commentThread",
+          "reason": "commentsDisabled",
+          "location": "videoId",
+          "locationType": "parameter"
+        }
+      ]
+    }
+  },
+  "playlistNotFound": {
+    "error": {
+      "code": 404,
+      "message": "The playlist identified with the request's <code>playlistId</code> parameter cannot be found.",
+      "errors": [
+        {
+          "message": "The playlist identified with the request's <code>playlistId</code> parameter cannot be found.",
+          "domain": "youtube.playlistItem",
+          "reason": "playlistNotFound",
+          "location": "playlistId",
+          "locationType": "parameter"
+        }
+      ]
+    }
+  },
+  "keyInvalid": {
+    "error": {
+      "code": 400,
+      "message": "API key not valid. Please pass a valid API key.",
+      "errors": [
+        {
+          "message": "API key not valid. Please pass a valid API key.",
+          "domain": "global",
+          "reason": "badRequest"
+        }
+      ],
+      "status": "INVALID_ARGUMENT",
+      "details": [
+        {
+          "@type": "type.googleapis.com/google.rpc.ErrorInfo",
+          "reason": "API_KEY_INVALID",
+          "domain": "googleapis.com",
+          "metadata": {
+            "service": "youtube.googleapis.com"
+          }
+        },
+        {
+          "@type": "type.googleapis.com/google.rpc.LocalizedMessage",
+          "locale": "en-US",
+          "message": "API key not valid. Please pass a valid API key."
+        }
+      ]
+    }
+  }
+}

@@ -12,24 +12,65 @@
 (defvar parens-near-end-function nil
   "What to do when the page's sentinel scrolls into view (more results).")
 
-;;;; Home
+;;;; Lists: home, results, channel
 
-(defun parens-home-load (self filter &optional more)
-  "Load the home page SELF for FILTER; with MORE, the next page of it."
-  (let ((token (and more (react-state self :next))))
+(defun parens-list-load (self key loader &optional more)
+  "Load the list page SELF: LOADER gets a page token and returns an
+awaitable of (:ids IDS :next TOKEN).  KEY is what the list is for (a
+filter, a query, a channel); an answer that comes after KEY or the source
+changed is dropped.  With MORE, the next page is added: if that fails,
+what is shown stays and a retry is offered under it."
+  (let* ((token (and more (react-state self :next)))
+         (generation parens-generation)
+         (current (lambda () (and (equal key (react-state self :key)) (not (parens-stale-p generation))))))
     (if more
-        (react-set-state self :status 'more)
-      (react-set-state self :filter filter :status 'loading :error nil :ids nil :next nil))
+        (react-set-state self :status 'more :more-error nil)
+      (react-set-state self :key key :status 'loading :error nil :more-error nil :ids nil :next nil))
     (react-async
       (condition-case failure
-          (let ((answer (react-await (parens-load-home filter token))))
-            (when (equal filter (react-state self :filter))
+          (let ((answer (react-await (funcall loader token))))
+            (when (funcall current)
               (react-set-state self :status 'ready :next (plist-get answer :next)
                                :ids (if more
                                         (seq-uniq (append (react-state self :ids) (plist-get answer :ids)))
                                       (plist-get answer :ids)))))
-        (error (when (equal filter (react-state self :filter))
-                 (react-set-state self :status 'failed :error (parens-failure-text failure))))))))
+        (error (when (funcall current)
+                 (if more
+                     (react-set-state self :status 'ready :more-error (parens-failure-text failure))
+                   (react-set-state self :status 'failed :error (parens-failure-text failure)))))))))
+
+(defun parens-more-function (self name more)
+  "When the sentinel NAME scrolls into view, call MORE (if there is more)."
+  (setq parens-near-end-function
+        (cons name (lambda ()
+                     (when (and (react-state self :next) (eq (react-state self :status) 'ready)
+                                (not (react-state self :more-error)))
+                       (funcall more))))))
+
+(defun parens-forget-more-function (name)
+  (when (equal (car parens-near-end-function) name)
+    (setq parens-near-end-function nil)))
+
+(defun parens-more-row (self name more)
+  "Under a list: a retry after a failure, or the sentinel and a button."
+  (let ((status (react-state self :status)))
+    (cond ((react-state self :more-error)
+           (jsx (div (:class "more-row") (parens-failed (react-state self :more-error) more))))
+          ((and (react-state self :next) (memq status '(ready more)))
+           (jsx (div (:class "more-row")
+                  (parens-sentinel name (length (react-state self :ids)))
+                  (button (:class "button" :type "button" :disabled (eq status 'more)
+                           :on-click (lambda (_event) (funcall more)))
+                    (parens-t (if (eq status 'more) 'loading 'more)))))))))
+
+(defun parens-source-changed-p (self previous-props)
+  (not (and (eql (react-props self :generation) (plist-get previous-props :generation))
+            (eq (react-props self :mode) (plist-get previous-props :mode)))))
+
+;;;; Home
+
+(defun parens-home-load (self filter &optional more)
+  (parens-list-load self filter (lambda (token) (parens-load-home filter token)) more))
 
 (defun parens-home-chips (self)
   "With a key, ask for the Data API's categories (the chips; else topics)."
@@ -48,45 +89,44 @@
             (react-state self :categories)
           (mapcar (lambda (topic) (cons (car topic) (parens-topic-name (car topic)))) parens-topics))))
 
-(defun parens-more-function (self loader)
-  "Make the sentinel load more of SELF with LOADER, when there is more."
-  (setq parens-near-end-function
-        (lambda ()
-          (when (and (react-state self :next) (eq (react-state self :status) 'ready))
-            (funcall loader)))))
-
 (react-define-component 'HomePage
-  :initial-state (lambda (_props) (list :filter nil :status 'loading :ids nil :next nil :categories nil))
+  :initial-state (lambda (_props) (list :key nil :status 'loading :ids nil :next nil :categories nil))
   :did-mount (lambda (self)
                (parens-home-load self nil)
                (parens-home-chips self)
-               (parens-more-function self (lambda () (parens-home-load self (react-state self :filter) t))))
+               (parens-more-function self "home" (lambda () (parens-home-load self (react-state self :key) t))))
   :did-update (lambda (self previous-props _previous-state)
-                (unless (eq (react-props self :mode) (plist-get previous-props :mode))
-                  (parens-home-load self nil)
-                  (parens-home-chips self)))
-  :will-unmount (lambda (_self) (setq parens-near-end-function nil))
+                (cond ((parens-source-changed-p self previous-props)
+                       (parens-home-load self nil)
+                       (parens-home-chips self))
+                      ;; The Data API names the categories in the language asked for.
+                      ((not (eq (react-props self :lang) (plist-get previous-props :lang)))
+                       (parens-home-chips self))))
+  :will-unmount (lambda (_self) (parens-forget-more-function "home"))
   :render
   (lambda (self)
-    (let ((status (react-state self :status))
-          (ids (react-state self :ids)))
+    (let ((ids (react-state self :ids)))
       (jsx (div (:class "home")
+             (h1 (:class "visually-hidden") "Parens")
              (parens-chips (parens-home-chip-list self)
-                           (react-state self :filter)
+                           (react-state self :key)
                            (lambda (filter) (parens-home-load self filter)))
-             (pcase status
+             (pcase (react-state self :status)
                ('loading (parens-skeleton-grid 12))
                ('failed (parens-failed (react-state self :error)
-                                       (lambda () (parens-home-load self (react-state self :filter)))))
+                                       (lambda () (parens-home-load self (react-state self :key)))))
                (_ (if ids (parens-grid ids) (parens-note (parens-t 'no-results)))))
-             (and (react-state self :next) (memq status '(ready more))
-                  (jsx (div (:class "more-row")
-                         (parens-sentinel "home" (length ids))
-                         (button (:class "button" :type "button" :disabled (eq status 'more)
-                                  :on-click (lambda (_event) (parens-home-load self (react-state self :filter) t)))
-                           (if (eq status 'more) (parens-t 'loading) (parens-t 'more)))))))))))
+             (parens-more-row self "home" (lambda () (parens-home-load self (react-state self :key) t))))))))
 
 ;;;; Watch
+
+(defun parens-player-error-text (code)
+  "What the YouTube player's error CODE means for the visitor."
+  (pcase code
+    (100 (parens-t 'player-100))
+    ((or 101 150) (parens-t 'player-150 code))
+    (153 (parens-t 'player-153))
+    (_ (parens-t 'cannot-play code))))
 
 (defvar parens-watch-page nil "The mounted watch page, for messages from the player.")
 
@@ -110,14 +150,15 @@
     (let ((id (react-props self :id)))
       (jsx (div (:class "player")
              ;; credentialless: the elisp-studio preview is cross-origin isolated
-             ;; (COEP), and YouTube's player sends no COEP header.  referrerpolicy:
-             ;; the player refuses to play without a Referer (error 153), and a
+             ;; (COEP), and YouTube's player sends no COEP header; the attribute
+             ;; also signs the player out, so only there.  referrerpolicy: the
+             ;; player refuses to play without a Referer (error 153), and a
              ;; server may send Referrer-Policy: same-origin.
              (iframe (:key id :class "player-frame" :data-player id
                       :src (parens-embed-url id (react-props self :start))
                       :title (or (react-props self :title) "YouTube")
                       :allow "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      :allowfullscreen t :credentialless t
+                      :allowfullscreen t :credentialless (react-props self :isolated)
                       :referrerpolicy "strict-origin-when-cross-origin")))))))
 
 (react-define-component 'Description
@@ -189,31 +230,38 @@
                          (parens-t 'more)))))))))
 
 (defun parens-watch-load (self)
-  (let ((id (react-props self :v)))
+  (let* ((id (react-props self :v))
+         (generation parens-generation)
+         (current (lambda () (and (equal id (react-props self :v)) (not (parens-stale-p generation))))))
     (react-set-state self :status 'loading :error nil :related nil :player-error nil)
     (react-async
       (condition-case failure
           (progn
             (react-await (parens-load-video id))
-            (when (equal id (react-props self :v))
+            (when (funcall current)
               (react-set-state self :status 'ready)
               (parens-watched id)
               (let ((related (condition-case nil (react-await (parens-load-related id)) (error nil))))
-                (when (equal id (react-props self :v))
+                (when (funcall current)
                   (react-set-state self :related related)))))
-        (error (when (equal id (react-props self :v))
+        (error (when (funcall current)
                  (react-set-state self :status 'failed :error (parens-failure-text failure))))))))
 
 (defun parens-next-video ()
-  "The video the watch page would play next, or nil."
-  (and parens-watch-page (car (react-state parens-watch-page :related))))
+  "The video to play when this one ends: the first related one not watched
+lately (else two videos of a channel would take turns forever)."
+  (when parens-watch-page
+    (let* ((related (react-state parens-watch-page :related))
+           (recent (mapcar (lambda (entry) (plist-get entry :id)) (seq-take (parens-app-state :history) 20))))
+      (or (seq-find (lambda (id) (not (member id recent))) related)
+          (car related)))))
 
 (react-define-component 'WatchPage
   :initial-state (lambda (_props) (list :status 'loading :related nil :player-error nil))
   :did-mount (lambda (self) (setq parens-watch-page self) (parens-watch-load self))
   :did-update (lambda (self previous-props _previous-state)
-                (unless (and (equal (react-props self :v) (plist-get previous-props :v))
-                             (eq (react-props self :mode) (plist-get previous-props :mode)))
+                (when (or (not (equal (react-props self :v) (plist-get previous-props :v)))
+                          (parens-source-changed-p self previous-props))
                   (parens-watch-load self)))
   :will-unmount (lambda (self) (when (eq parens-watch-page self) (setq parens-watch-page nil)))
   :render
@@ -226,15 +274,16 @@
            (status (react-state self :status)))
       (jsx (div (:class "watch")
              (div (:class "watch-main")
-               (Player (:id id :start (react-props self :t) :title (plist-get video :title)))
+               (Player (:id id :start (react-props self :t) :title (plist-get video :title) :isolated parens-isolated))
                (and (react-state self :player-error)
-                    (parens-note (parens-t 'cannot-play (react-state self :player-error)) "player-error"))
+                    (parens-note (parens-player-error-text (react-state self :player-error)) "player-error"))
                (h1 (:class "watch-title")
                  (or (plist-get video :title) (if (eq status 'failed) "" (jsx (span (:class "skeleton-line wide") "")))))
                (and (eq status 'failed)
                     (parens-failed (react-state self :error) (lambda () (parens-watch-load self))))
                (div (:class "owner")
-                 (a (:class "owner-avatar" :href (parens-route-url (or (parens-channel-route channel-id) '(:page home))))
+                 (a (:class "owner-avatar" :href (parens-route-url (or (parens-channel-route channel-id) '(:page home)))
+                     :aria-label (or (parens-channel-name video) ""))
                    (parens-avatar (or channel video)))
                  (div (:class "owner-text")
                    (a (:class "owner-name" :href (parens-route-url (or (parens-channel-route channel-id) '(:page home))))
@@ -255,7 +304,8 @@
                    (a (:class "pill" :href (parens-watch-url id) :target "_blank" :rel "noopener")
                      (parens-icon "external") (parens-t 'open-youtube))))
                (Description (:key id :video video :lang parens-lang :mode parens-mode))
-               (Comments (:key (format "%s-%s" id parens-mode) :video-id id :count (plist-get video :comment-count))))
+               (Comments (:key (format "%s-%s-%s" id parens-mode parens-generation)
+                          :video-id id :count (plist-get video :comment-count))))
              (aside (:class "watch-side")
                (div (:class "up-next")
                  (h2 (:class "section-title") (parens-t 'up-next))
@@ -270,73 +320,47 @@
 ;;;; Results
 
 (defun parens-results-load (self &optional more)
-  (let ((query (react-props self :q))
-        (token (and more (react-state self :next))))
-    (if more
-        (react-set-state self :status 'more)
-      (react-set-state self :status 'loading :error nil :ids nil :next nil))
-    (react-async
-      (condition-case failure
-          (let ((answer (react-await (parens-load-search query token))))
-            (when (equal query (react-props self :q))
-              (react-set-state self :status 'ready :next (plist-get answer :next)
-                               :ids (if more
-                                        (seq-uniq (append (react-state self :ids) (plist-get answer :ids)))
-                                      (plist-get answer :ids)))))
-        (error (when (equal query (react-props self :q))
-                 (react-set-state self :status 'failed :error (parens-failure-text failure))))))))
+  (let ((query (react-props self :q)))
+    (parens-list-load self query (lambda (token) (parens-load-search query token)) more)))
 
 (react-define-component 'ResultsPage
-  :initial-state (lambda (_props) (list :status 'loading :ids nil :next nil))
+  :initial-state (lambda (_props) (list :key nil :status 'loading :ids nil :next nil))
   :did-mount (lambda (self)
                (parens-results-load self)
-               (parens-more-function self (lambda () (parens-results-load self t))))
+               (parens-more-function self "results" (lambda () (parens-results-load self t))))
   :did-update (lambda (self previous-props _previous-state)
-                (unless (and (equal (react-props self :q) (plist-get previous-props :q))
-                             (eq (react-props self :mode) (plist-get previous-props :mode)))
+                (when (or (not (equal (react-props self :q) (plist-get previous-props :q)))
+                          (parens-source-changed-p self previous-props))
                   (parens-results-load self)))
-  :will-unmount (lambda (_self) (setq parens-near-end-function nil))
+  :will-unmount (lambda (_self) (parens-forget-more-function "results"))
   :render
   (lambda (self)
-    (let ((status (react-state self :status))
-          (ids (react-state self :ids)))
+    (let ((ids (react-state self :ids)))
       (jsx (div (:class "results")
              (h1 (:class "page-title") (parens-t 'results-for (react-props self :q)))
              (and (not (eq parens-mode 'api)) (parens-note (parens-t 'results-local)))
-             (pcase status
+             (pcase (react-state self :status)
                ('loading (parens-note (parens-t 'loading)))
                ('failed (parens-failed (react-state self :error) (lambda () (parens-results-load self))))
                (_ (if ids (parens-wide-list ids) (parens-note (parens-t 'no-results)))))
-             (and (react-state self :next) (eq status 'ready)
-                  (parens-sentinel "results" (length ids))))))))
+             (parens-more-row self "results" (lambda () (parens-results-load self t))))))))
 
 ;;;; Channel
 
 (defun parens-channel-load (self &optional more)
-  (let ((channel-id (react-props self :id))
-        (token (and more (react-state self :next))))
-    (if more
-        (react-set-state self :status 'more)
-      (react-set-state self :status 'loading :error nil :ids nil :next nil))
-    (react-async
-      (condition-case failure
-          (let ((answer (react-await (parens-load-channel channel-id token))))
-            (when (equal channel-id (react-props self :id))
-              (react-set-state self :status 'ready :next (plist-get answer :next)
-                               :ids (append (and more (react-state self :ids)) (plist-get answer :ids)))))
-        (error (when (equal channel-id (react-props self :id))
-                 (react-set-state self :status 'failed :error (parens-failure-text failure))))))))
+  (let ((channel-id (react-props self :id)))
+    (parens-list-load self channel-id (lambda (token) (parens-load-channel channel-id token)) more)))
 
 (react-define-component 'ChannelPage
-  :initial-state (lambda (_props) (list :status 'loading :ids nil :next nil))
+  :initial-state (lambda (_props) (list :key nil :status 'loading :ids nil :next nil))
   :did-mount (lambda (self)
                (parens-channel-load self)
-               (parens-more-function self (lambda () (parens-channel-load self t))))
+               (parens-more-function self "channel" (lambda () (parens-channel-load self t))))
   :did-update (lambda (self previous-props _previous-state)
-                (unless (and (equal (react-props self :id) (plist-get previous-props :id))
-                             (eq (react-props self :mode) (plist-get previous-props :mode)))
+                (when (or (not (equal (react-props self :id) (plist-get previous-props :id)))
+                          (parens-source-changed-p self previous-props))
                   (parens-channel-load self)))
-  :will-unmount (lambda (_self) (setq parens-near-end-function nil))
+  :will-unmount (lambda (_self) (parens-forget-more-function "channel"))
   :render
   (lambda (self)
     (let* ((channel-id (react-props self :id))
@@ -363,8 +387,7 @@
                ('loading (parens-skeleton-grid 8))
                ('failed (parens-failed (react-state self :error) (lambda () (parens-channel-load self))))
                (_ (if ids (parens-grid ids) (parens-note (parens-t 'no-results)))))
-             (and (react-state self :next) (eq (react-state self :status) 'ready)
-                  (parens-sentinel "channel" (length ids))))))))
+             (parens-more-row self "channel" (lambda () (parens-channel-load self t))))))))
 
 ;;;; History and watch later
 
@@ -388,7 +411,8 @@
 ;;;; Dialogs
 
 (react-define-component 'SettingsDialog
-  :initial-state (lambda (_props) (list :draft (or parens-api-key "")))
+  :initial-state (lambda (_props) (list :draft (or parens-api-key "")
+                                        :remember (and (react-storage-get "parens/api-key") t)))
   :did-mount (lambda (self) (react-focus self "key"))
   :render
   (lambda (self)
@@ -402,13 +426,19 @@
              (section (:class "setting")
                (h3 (parens-t 'api-key))
                (p (:class "muted mode-line")
-                 (format "%s: %s" (parens-mode-name parens-mode t) (or parens-mode-note "")))
-               (form (:class "key-form" :on-submit (lambda (_event) (parens-use-key (string-trim (react-state self :draft)))))
+                 (format "%s: %s" (parens-mode-name parens-mode t) (or (parens-mode-note-text) "")))
+               (form (:class "key-form"
+                      :on-submit (lambda (_event) (parens-use-key (string-trim (react-state self :draft))
+                                                                  (react-state self :remember))))
                  (input (:ref "key" :type "password" :autocomplete "off" :spellcheck "false" :value draft
                          :placeholder "AIza…" :aria-label (parens-t 'api-key)
                          :on-input (lambda (event) (react-set-state self :draft (plist-get event :value)))))
                  (button (:class "button" :type "submit" :disabled (string-empty-p (string-trim draft)))
                    (parens-t 'api-key-save)))
+               (label (:class "switch")
+                 (input (:type "checkbox" :checked (react-state self :remember)
+                         :on-change (lambda (event) (react-set-state self :remember (plist-get event :checked)))))
+                 (span (parens-t 'api-key-remember)))
                (and parens-api-key
                     (jsx (button (:class "text-button" :type "button" :on-click (lambda (_event) (parens-use-key nil)))
                            (parens-t 'api-key-remove))))

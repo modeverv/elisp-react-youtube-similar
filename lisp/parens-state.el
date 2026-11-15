@@ -13,6 +13,18 @@
 
 (defconst parens-default-settings '(:lang ja :theme dark :autoplay t))
 
+(defvar parens-narrow nil
+  "Non-nil when the window is narrow (the page's script says so): the
+sidebar is then a drawer over the page.  Lisp cannot ask the window.")
+
+(defun parens-settings (stored)
+  "`parens-default-settings' with what STORED says, nil values included
+\(autoplay turned off is (:autoplay nil))."
+  (let ((settings (copy-sequence parens-default-settings)))
+    (dolist (key '(:lang :theme :autoplay) settings)
+      (when (plist-member stored key)
+        (setq settings (plist-put settings key (plist-get stored key)))))))
+
 (defun parens-app-state (key)
   (and parens-app (react-state parens-app key)))
 
@@ -82,8 +94,12 @@
 (defun parens-show (route)
   "Show ROUTE (the page's address has changed already, or there is none)."
   (unless (equal route (parens-app-state :route))
-    (parens-app-set :route route :dialog nil :sidebar nil)
+    (parens-app-set :route route :dialog nil)
+    ;; A drawer closes when a page is chosen; a sidebar beside the page stays.
+    (when parens-narrow (parens-app-set :sidebar nil))
     (parens-port-send "scroll-top")
+    ;; The keyboard starts again at the top of the new page.
+    (when parens-app (react-focus parens-app "content"))
     ;; The studio's preview has no address: remember where it was, so that
     ;; restarting the application (a change of index.html) comes back here.
     (when parens-studio (react-storage-set "parens/studio-route" route))))
@@ -104,10 +120,15 @@
     (react-storage-set "parens/settings" settings)
     (parens-app-set :settings settings)))
 
-(defun parens-use-key (key)
-  "Use the Data API with KEY from now on; nil: without a key."
+(defun parens-use-key (key &optional remember)
+  "Use the Data API with KEY from now on; nil: without a key.
+With REMEMBER the key is kept in localStorage, where every page of the
+origin can read it (all of modeverv.github.io on GitHub Pages); without
+it, only until the page is closed."
   (let ((key (and key (not (string-empty-p key)) key)))
-    (if key (react-storage-set "parens/api-key" key) (react-storage-remove "parens/api-key"))
+    (if (and key remember)
+        (react-storage-set "parens/api-key" key)
+      (react-storage-remove "parens/api-key"))
     (parens-forget-everything)
     (setq parens-api-key key
           parens-mode (and key 'api))
@@ -143,10 +164,13 @@ allow keeping data fetched without signing in for 30 days.")
                                  :thumbnail (plist-get entry :thumbnail) :duration (plist-get entry :duration)))))
 
 (defun parens-library-load (name)
-  "The entries kept under NAME, without old ones; remembered as videos."
+  "The entries kept under NAME, without old ones; remembered as videos.
+Old ones are removed from localStorage too, not only from the page."
   (let* ((cutoff (- (float-time) (* parens-library-days 86400)))
-         (entries (seq-filter (lambda (entry) (> (or (plist-get entry :saved) 0) cutoff))
-                              (react-storage-get (concat "parens/" name)))))
+         (stored (react-storage-get (concat "parens/" name)))
+         (entries (seq-filter (lambda (entry) (> (or (plist-get entry :saved) 0) cutoff)) stored)))
+    (unless (= (length entries) (length stored))
+      (react-storage-set (concat "parens/" name) entries))
     (parens-library-remember entries)
     entries))
 
