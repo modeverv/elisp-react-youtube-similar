@@ -1,10 +1,8 @@
 ;;; parens-source.el --- where the videos come from  -*- lexical-binding: t; -*-
 
-;; Three sources, one shape of data.  A video is a plist:
-;;
-;;   (:id :title :channel-id :channel :channel-url :published :views :likes
-;;    :comment-count :duration :description :thumbnail :category :live
-;;    :embeddable :complete)
+;; Three sources, one shape of data: a video is a `parens-video' and a
+;; channel a `parens-channel' (shared/parens-types.el, which server.el
+;; uses too), made with `make-parens-video', which checks the fields.
 ;;
 ;; - `api': the YouTube Data API v3 with the visitor's key, called from the
 ;;   page (Google's API answers other sites' pages: CORS).
@@ -25,6 +23,8 @@
 (require 'seq)
 (require 'subr-x)
 (require 'url-util)
+
+(declare-function parens-later-sync "parens-state")
 
 ;;;; What is known
 
@@ -194,20 +194,6 @@ Its value is the list of their values; nil for one that failed."
                                                            (format "HTTP %s" (plist-get response :status)))))))))
                  :catch reject)))
 
-(defun parens-lisp-request (url)
-  "An awaitable: the Lisp data that server.el answers at URL."
-  (lambda (resolve reject)
-    (react-fetch url
-                 :then (lambda (response)
-                         (let ((data (ignore-errors (car (read-from-string (plist-get response :text))))))
-                           (if (plist-get response :ok)
-                               (funcall resolve data)
-                             (funcall reject (list :status (plist-get response :status)
-                                                   :message (if (stringp data)
-                                                                data
-                                                              (format "HTTP %s" (plist-get response :status))))))))
-                 :catch reject)))
-
 (defun parens-oembed (id)
   "An awaitable: YouTube's oEmbed answer about the video ID."
   (parens-json-request (concat "https://www.youtube.com/oembed?format=json&url="
@@ -238,7 +224,8 @@ Parameters whose value is nil are left out."
          (details (plist-get item :contentDetails))
          (status (plist-get item :status))
          (id (plist-get item :id)))
-    (list :id id
+    (make-parens-video
+          :id id
           ;; hl= translates only `localized', not the title itself.
           :title (or (plist-get (plist-get snippet :localized) :title) (plist-get snippet :title))
           :channel-id (plist-get snippet :channelId)
@@ -263,7 +250,8 @@ Parameters whose value is nil are left out."
   (let* ((snippet (plist-get item :snippet))
          (statistics (plist-get item :statistics))
          (pictures (plist-get snippet :thumbnails)))
-    (list :id (plist-get item :id)
+    (make-parens-channel
+          :id (plist-get item :id)
           :title (plist-get snippet :title)
           :handle (plist-get snippet :customUrl)
           :avatar (plist-get (or (plist-get pictures :medium) (plist-get pictures :default)) :url)
@@ -286,10 +274,10 @@ Parameters whose value is nil are left out."
           :replies (parens-number (plist-get thread :totalReplyCount)))))
 
 (defun parens-video-from-oembed (id answer)
-  (list :id id
-        :title (plist-get answer :title)
-        :channel (plist-get answer :author_name)
-        :channel-url (plist-get answer :author_url)))
+  (make-parens-video :id id
+                     :title (plist-get answer :title)
+                     :channel (plist-get answer :author_name)
+                     :channel-url (plist-get answer :author_url)))
 
 (defun parens-playable-p (id)
   (not (eq (plist-get (parens-video id) :embeddable) :false)))
@@ -356,7 +344,8 @@ A failure here only costs pictures: it is ignored."
     (let* ((generation parens-generation)
            (problem nil)
            (answer (condition-case failure
-                       (react-await (parens-lisp-request "api/feed"))
+                       ;; A `parens-feed', checked as it comes (api/feed.el checks it too).
+                       (react-await (nextel-request "GET" "/api/feed" :returns 'parens-feed))
                      (error (setq problem failure) nil))))
       ;; A key was saved meanwhile: this answer is for a source that is gone.
       (when (parens-stale-p generation) (error "Stale"))
@@ -368,12 +357,13 @@ A failure here only costs pictures: it is ignored."
           (progn
             (setq parens-mode 'server)
             (dolist (channel (plist-get answer :channels)) (parens-remember-channel channel))
-            (setq parens-catalogue (mapcar #'parens-remember-video (plist-get answer :videos))))
+            (setq parens-catalogue (mapcar #'parens-remember-video (plist-get answer :videos)))
+            (parens-later-sync))
         (setq parens-mode 'curated)
         (setq parens-catalogue
               (mapcar (lambda (entry)
-                        (parens-remember-video (list :id (car entry) :channel-id (cadr entry)
-                                                     :thumbnail (parens-thumbnail-url (car entry)))))
+                        (parens-remember-video (make-parens-video :id (car entry) :channel-id (cadr entry)
+                                                                  :thumbnail (parens-thumbnail-url (car entry)))))
                       parens-curated-videos))
         (parens-curated-titles))
       (parens-changed)

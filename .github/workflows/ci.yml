@@ -20,14 +20,21 @@ jobs:
         with:
           repository: modeverv/elisp-react
           path: elisp-react
+      # app-server.el, for the tests of the server side (api/).
+      - uses: actions/checkout@v4
+        with:
+          repository: modeverv/elisp-studio
+          path: elisp-studio
       - name: Install Emacs
         run: |
           sudo apt-get update
           sudo apt-get install -y emacs-nox
+      - name: The routes are written from pages/
+        run: vendor/elisp-next/bin/nextel-routes --check
       - name: Test the application's Lisp
         run: |
           emacs --version | head -1
-          ELISP_REACT=elisp-react test/run-ert.sh
+          ELISP_REACT=elisp-react ELISP_STUDIO=elisp-studio test/run-ert.sh
 
   # The site is the repository itself: static files, no build step.  Without
   # server.el's native Emacs it runs without a key (or with the visitor's).

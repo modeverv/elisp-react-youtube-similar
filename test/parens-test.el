@@ -4,7 +4,8 @@
 ;; elisp-react next to this repository (../elisp-react) or $ELISP_REACT.
 ;;
 ;; The application is mounted as in the page; this file plays the page:
-;; it answers the port's commands, fires DOM events at elements found by
+;; it keeps the address (the router of elisp-next follows it),
+;; answers the port's commands, fires DOM events at elements found by
 ;; their attributes, and answers fetches with made-up YouTube data (no
 ;; network; the made-up ids are not real videos).
 
@@ -19,15 +20,22 @@
 
 (defvar parens-test-build (make-temp-file "parens-test-" t))
 
-(defconst parens-test-files
-  '("parens-util" "parens-port" "parens-data" "parens-source" "parens-state" "parens-ui" "parens-pages" "parens-app"))
+(defun parens-test-files ()
+  "The Lisp files of index.html, in its order (elisp-next's nextel-build.el
+lists the framework, shared/ and pages/ there)."
+  (with-temp-buffer
+    (insert-file-contents (expand-file-name "index.html" parens-test-root))
+    (let (files)
+      (while (re-search-forward "<script type=\"text/emacs-lisp\" src=\"\\([^\"]+\\)\"" nil t)
+        (push (match-string 1) files))
+      (nreverse files))))
 
 (defun parens-test-load-library ()
   "Load react.el and the application's files, compiled, as the page does."
   (let ((byte-compile-dest-file-function
-         (lambda (file) (expand-file-name (concat (file-name-nondirectory file) "c") parens-test-build))))
-    (dolist (name parens-test-files)
-      (let ((file (expand-file-name (concat "lisp/" name ".el") parens-test-root)))
+         (lambda (file) (expand-file-name (concat (md5 (expand-file-name file)) ".elc") parens-test-build))))
+    (dolist (name (parens-test-files))
+      (let ((file (expand-file-name name parens-test-root)))
         (unless (byte-compile-file file) (error "%s does not compile" file))
         (load (funcall byte-compile-dest-file-function file) nil t)))))
 
@@ -37,15 +45,33 @@
 (defvar parens-test-pending nil "Host calls not answered: ((REQUEST COMMAND ARGUMENT) ...).")
 (defvar parens-test-commands nil "Port commands carried out: plists, oldest first.")
 
+(defun parens-test-location (href)
+  "The address HREF (\"#/watch?v=ID\") as elisp-react describes one."
+  (list :href (concat "https://example.test/" href) :pathname "/" :search ""
+        :hash (if (string-prefix-p "#" href) href "")))
+
 (defun parens-test-apply (ops)
-  "What the page does with OPS: keep them, carry out port commands."
+  "What the page does with OPS: keep them, carry out port commands, go
+where Lisp navigates (and tell Lisp, as the host does)."
   (setq ops (append ops nil))
   (setq parens-test-ops (append parens-test-ops ops))
-  (dolist (op ops)
-    (pcase (append op nil)
-      (`("call" ,request ,command ,argument) (setq parens-test-pending (append parens-test-pending (list (list request command argument)))))
-      (`("cancel" ,request) (setq parens-test-pending (seq-remove (lambda (call) (eql (car call) request)) parens-test-pending)))))
-  (parens-test-run-port))
+  (let (navigate)
+    (dolist (op ops)
+      (pcase (append op nil)
+        (`("call" ,request ,command ,argument) (setq parens-test-pending (append parens-test-pending (list (list request command argument)))))
+        (`("cancel" ,request) (setq parens-test-pending (seq-remove (lambda (call) (eql (car call) request)) parens-test-pending)))
+        (`("tell" "navigate" ,argument) (setq navigate (plist-get argument :url)))))
+    (parens-test-run-port)
+    (when navigate (parens-test-go navigate))))
+
+(defun parens-test-go (href)
+  "The address becomes HREF (a link, Back, `nextel-navigate')."
+  (parens-test-apply (react--location-changed (parens-test-location href))))
+
+(defun parens-test-told (command)
+  "The arguments of the \"tell\" operations COMMAND so far, oldest first."
+  (delq nil (mapcar (lambda (op) (and (equal (aref op 0) "tell") (equal (aref op 1) command) (aref op 2)))
+                    parens-test-ops)))
 
 (defun parens-test-host (predicate)
   "The DOM id of the first mounted element whose props satisfy PREDICATE."
@@ -103,19 +129,21 @@
 
 (defun parens-test-html () (react-html "#app"))
 
-(defun parens-test-start (&optional storage)
-  "Mount the application afresh with localStorage STORAGE (an alist of key . value)."
+(defun parens-test-start (&optional storage href)
+  "Mount the application afresh at the address HREF (\"#/\"), with
+localStorage STORAGE (an alist of key . value)."
   (react-reset)
   (setq parens-test-ops nil parens-test-pending nil parens-test-commands nil parens-test-done 0
-        parens-port--outbox nil parens-port--seq 0 parens-port--instance nil parens--sent-title nil
+        parens-port--outbox nil parens-port--seq 0 parens-port--instance nil
         parens-app nil parens-header nil parens-watch-page nil parens-near-end-function nil
         parens-mode nil parens-api-key nil parens-lang 'ja)
   (parens-forget-everything)
   (react--storage-load (vconcat (mapcar (lambda (entry) (vector (car entry) (prin1-to-string (cdr entry)))) storage)))
-  (parens-test-apply (progn (react-mount (jsx (App)) "#app") (react-flush))))
+  (react--location-set (parens-test-location (or href "#/")))
+  (parens-test-apply (progn (nextel-start "#app") (react-flush))))
 
-(defun parens-test-hello (&optional url studio)
-  (parens-test-message (list :type "hello" :url (or url "#/") :origin "https://example.test"
+(defun parens-test-hello (&optional studio)
+  (parens-test-message (list :type "hello" :origin "https://example.test"
                              :studio (if studio t :false) :light :false)))
 
 (defun parens-test-oembed (id)
@@ -191,24 +219,28 @@
   (should (equal (parens-linkify "javascript:alert(1)") '("javascript:alert(1)"))))
 
 (ert-deftest parens-routes ()
-  (should (equal (parens-route-parse "#/") '(:page home)))
-  (should (equal (parens-route-parse "") '(:page home)))
-  (should (equal (parens-route-parse "#/watch?v=8V4ZyEL_i-s") '(:page watch :v "8V4ZyEL_i-s" :t nil)))
-  (should (equal (parens-route-parse "#/watch?v=8V4ZyEL_i-s&t=90s") '(:page watch :v "8V4ZyEL_i-s" :t 90)))
-  (should (equal (parens-route-parse "#/watch?v=bad\"id") '(:page home)))
-  (should (equal (parens-route-parse "#/results?search_query=%E6%95%B0%E5%AD%A6+emacs")
-                 '(:page results :q "数学 emacs")))
-  (should (equal (parens-route-parse "#/results?search_query=数学%20emacs")
-                 '(:page results :q "数学 emacs")))
-  (should (equal (parens-route-parse "#/channel/UC0uTPqBCFIpZxlz_Lv1tk_g")
-                 '(:page channel :id "UC0uTPqBCFIpZxlz_Lv1tk_g")))
-  (should (equal (parens-route-parse "#/channel/../../x") '(:page home)))
-  (should (equal (parens-route-parse "#/feed/history") '(:page history)))
-  (should (equal (parens-route-parse "#/playlist?list=WL") '(:page later)))
-  (dolist (route '((:page home) (:page watch :v "8V4ZyEL_i-s" :t 30) (:page results :q "数学 emacs")
-                   (:page channel :id "UC0uTPqBCFIpZxlz_Lv1tk_g") (:page history) (:page later)))
-    (should (equal (parens-route-parse (parens-route-url route))
-                   (if (eq (plist-get route :page) 'watch) route route)))))
+  "The pages are files: their addresses, as the router reads them."
+  (let ((page (lambda (href) (let ((route (nextel--location-route (parens-test-location href))))
+                               (list (plist-get route :page) (plist-get route :params) (plist-get route :query))))))
+    (should (equal (funcall page "#/") '(HomePage nil nil)))
+    (should (equal (funcall page "") '(HomePage nil nil)))
+    (should (equal (funcall page "#/watch?v=8V4ZyEL_i-s&t=90s") '(WatchPage nil (("v" . "8V4ZyEL_i-s") ("t" . "90s")))))
+    (should (equal (funcall page "#/results?search_query=%E6%95%B0%E5%AD%A6+emacs")
+                   '(ResultsPage nil (("search_query" . "数学 emacs")))))
+    (should (equal (funcall page "#/channel/UC0uTPqBCFIpZxlz_Lv1tk_g")
+                   '(ChannelPage (:id "UC0uTPqBCFIpZxlz_Lv1tk_g") nil)))
+    (should (equal (funcall page "#/feed/history") '(HistoryPage nil nil)))
+    (should (equal (funcall page "#/playlist?list=WL") '(PlaylistPage nil (("list" . "WL")))))
+    (should (equal (funcall page "#/channel/a/b") '(NotFoundPage nil nil)))
+    (should (equal (funcall page "#/nothing") '(NotFoundPage nil nil))))
+  (should (equal (parens-watch-href "8V4ZyEL_i-s" 30) "#/watch?v=8V4ZyEL_i-s&t=30"))
+  (should (equal (parens-watch-href "8V4ZyEL_i-s" 0) "#/watch?v=8V4ZyEL_i-s"))
+  (should (equal (parens-channel-href "UC0uTPqBCFIpZxlz_Lv1tk_g") "#/channel/UC0uTPqBCFIpZxlz_Lv1tk_g"))
+  (should (equal (parens-channel-href nil) "#/"))
+  (should (equal (nextel-href "/results" :search_query "数学 emacs") "#/results?search_query=%E6%95%B0%E5%AD%A6%20emacs"))
+  (should (equal (nextel-href "/playlist" :list "WL") "#/playlist?list=WL"))
+  ;; The watch page of something that is no video's id shows that.
+  (should (equal (parens-watch-id (nextel--location-route (parens-test-location "#/watch?v=bad\"id"))) nil)))
 
 (ert-deftest parens-api-records ()
   (let ((video (parens-video-from-api (parens-test-api-video "abcdefghijk" "UCxxxxxxxxxxxxxxxxxxxxxx"))))
@@ -245,8 +277,9 @@
   (parens-test-answer-oembeds)
   (should (string-match-p "Video 8V4ZyEL_i-s" (parens-test-html)))
   (should (string-match-p "i.ytimg.com/vi/8V4ZyEL_i-s/mqdefault.jpg" (parens-test-html)))
-  ;; The title was asked for, and every command was acknowledged.
-  (should (seq-find (lambda (command) (equal (plist-get command :cmd) "title")) parens-test-commands))
+  ;; The title was set (by the router, from the page's :head), and every
+  ;; command was acknowledged.
+  (should (equal (car (last (parens-test-told "title"))) '(:text "Parens")))
   (should (null parens-port--outbox))
   ;; A chip: only the space videos.
   (let ((chip (parens-test-host (lambda (props host) (and (eq (react--host-tag host) 'button)
@@ -263,8 +296,8 @@
   (mapconcat (lambda (child) (if (react--text-p child) (react--text-text child) "")) (react--host-children host) ""))
 
 (ert-deftest parens-watch-page ()
-  (parens-test-start)
-  (parens-test-hello "#/watch?v=JJPokfFxyFo&t=30")
+  (parens-test-start nil "#/watch?v=JJPokfFxyFo&t=30")
+  (parens-test-hello)
   (parens-test-respond "\\`api/feed\\'" 404 "")
   (parens-test-answer-oembeds)
   (let ((html (parens-test-html)))
@@ -277,8 +310,7 @@
     (should (string-match-p "referrerpolicy=\"strict-origin-when-cross-origin\"" html))
     (should (string-match-p "Video JJPokfFxyFo" html)))
   ;; In elisp-studio's preview (isolated) the frame must be credentialless.
-  (parens-test-message (list :type "hello" :url "#/watch?v=JJPokfFxyFo&t=30" :origin "https://example.test"
-                             :studio t :isolated t :light :false))
+  (parens-test-message (list :type "hello" :origin "https://example.test" :studio t :isolated t :light :false))
   (parens-test-apply (react-flush))
   (should (string-match-p "credentialless" (parens-test-html)))
   ;; Related: the same channel first.
@@ -291,11 +323,10 @@
   (should (react-storage-get "parens/history"))
   ;; The player ended: autoplay goes to the next video.
   (parens-test-message (list :type "player" :id "JJPokfFxyFo" :state 0))
-  (should (equal (parens-app-state :route) '(:page watch :v "-9rpQA6O3aM" :t nil)))
-  (should (equal (plist-get (seq-find (lambda (command) (equal (plist-get command :cmd) "navigate"))
-                                     (reverse parens-test-commands))
-                           :url)
-                 "#/watch?v=-9rpQA6O3aM"))
+  (should (equal (plist-get (car (last (parens-test-told "navigate"))) :url) "#/watch?v=-9rpQA6O3aM"))
+  (should (equal (nextel-query (nextel-route) "v") "-9rpQA6O3aM"))
+  (should (string-match-p "youtube-nocookie.com/embed/-9rpQA6O3aM\\?" (parens-test-html)))
+  (should (equal (car (last (parens-test-told "title"))) '(:text "Video -9rpQA6O3aM - Parens")))
   ;; A player error is shown.
   (parens-test-message (list :type "player-error" :id "-9rpQA6O3aM" :code 150))
   (should (string-match-p "他のサイトでの再生を許可していません（エラー 150）" (parens-test-html))))
@@ -309,7 +340,8 @@
         (form (parens-test-host (lambda (props _host) (equal (plist-get props :role) "search")))))
     (parens-test-event input "input" :type "input" :value "  Video 8V4  ")
     (parens-test-event form "submit" :type "submit")
-    (should (equal (parens-app-state :route) '(:page results :q "Video 8V4")))
+    (should (equal (plist-get (car (last (parens-test-told "navigate"))) :url) "#/results?search_query=Video%208V4"))
+    (should (equal (nextel-query (nextel-route) "search_query") "Video 8V4"))
     (should (string-match-p "data-video=\"8V4ZyEL_i-s\"" (parens-test-html)))
     (should-not (string-match-p "data-video=\"yH0Gan6xMTo\"" (parens-test-html))))
   ;; "/" focuses the search field.
@@ -336,6 +368,71 @@
   (should-not (seq-find (lambda (url) (string-match-p "oembed" url)) (parens-test-pending-urls)))
   (should (string-match-p "From the feed" (parens-test-html)))
   (should (string-match-p "1234 回視聴" (parens-test-html))))
+
+(defun parens-test-fetch-call (pattern)
+  "The argument of the pending fetch whose address matches PATTERN."
+  (nth 2 (seq-find (lambda (call) (funcall (parens-test-fetch-p pattern) (nth 1 call) (nth 2 call))) parens-test-pending)))
+
+(ert-deftest parens-server-later ()
+  "With server.el, \"watch later\" is the server's: the page asks for it,
+and changes it with requests whose bodies and answers are checked against
+`parens-later-entry' (shared/parens-types.el)."
+  (parens-test-start)
+  (parens-test-hello)
+  (parens-test-respond "\\`api/feed\\'" 200
+                       (prin1-to-string (list :videos (list (list :id "aaaaaaaaaaa" :title "From the feed"
+                                                                  :channel-id "UC0uTPqBCFIpZxlz_Lv1tk_g"))
+                                              :channels nil)))
+  (should (eq parens-mode 'server))
+  (parens-test-respond "\\`api/later\\'" 200
+                       (prin1-to-string (list (list :id "aaaaaaaaaaa" :title "Kept by the server" :saved 1.0))))
+  (should (equal (mapcar (lambda (entry) (plist-get entry :id)) (parens-app-state :later)) '("aaaaaaaaaaa")))
+  ;; Taken off: DELETE /api/later/ID; the answer is the list now.
+  (parens-toggle-later "aaaaaaaaaaa")
+  (parens-test-apply (react-flush))
+  (should (equal (plist-get (parens-test-fetch-call "\\`api/later/aaaaaaaaaaa\\'") :method) "DELETE"))
+  (parens-test-respond "\\`api/later/aaaaaaaaaaa\\'" 200 "nil")
+  (should (null (parens-app-state :later)))
+  ;; Put on: POST /api/later with a `parens-later-entry'.
+  (parens-toggle-later "aaaaaaaaaaa")
+  (parens-test-apply (react-flush))
+  (let ((call (parens-test-fetch-call "\\`api/later\\'")))
+    (should (equal (plist-get call :method) "POST"))
+    (should (parens-later-entry-p (car (read-from-string (plist-get call :body))))))
+  ;; An answer of another shape: the page says what is wrong, and keeps its list.
+  (parens-test-respond "\\`api/later\\'" 200 "((:id 42))")
+  (should (string-match-p "POST /api/later\\[0\\]\\.id: expected string, got 42" (parens-test-html)))
+  (should (equal (mapcar (lambda (entry) (plist-get entry :id)) (parens-app-state :later)) '("aaaaaaaaaaa"))))
+
+(ert-deftest parens-server-wrong-feed ()
+  "A feed that is not a `parens-feed' is not taken: the curated list, and why."
+  (parens-test-start)
+  (parens-test-hello)
+  (parens-test-respond "\\`api/feed\\'" 200 (prin1-to-string '(:videos ((:id "aaaaaaaaaaa" :views "many")))))
+  (should (eq parens-mode 'curated))
+  (should (string-match-p "GET /api/feed\\.videos\\[0\\]\\.views: expected number" (parens-mode-note-text))))
+
+(defconst parens-test-studio
+  (expand-file-name "lisp/app-server.el" (or (getenv "ELISP_STUDIO") (expand-file-name "../elisp-studio" parens-test-root)))
+  "elisp-studio's app-server.el, which the server side needs.")
+
+(ert-deftest parens-server-api ()
+  "server.el answers with the files of api/ (a native Emacs, elisp-studio's app-server.el)."
+  (skip-unless (file-readable-p parens-test-studio))
+  (load parens-test-studio nil t)
+  (let ((app-server-data-directory (make-temp-file "parens-test-data" t))
+        (app-server-project-directory parens-test-root)
+        (call (lambda (method path &optional body)
+                (let ((answer (app-server-respond method path (or body ""))))
+                  (list (aref answer 0) (car (read-from-string (aref answer 1))))))))
+    (load (expand-file-name "server.el" parens-test-root) nil t)
+    (should (equal (funcall call "GET" "/api/later") '(200 nil)))
+    (should (equal (funcall call "POST" "/api/later" (prin1-to-string (list :id "abcdefghijk" :title "T" :saved 2.0)))
+                   '(200 ((:id "abcdefghijk" :title "T" :saved 2.0)))))
+    (should (equal (funcall call "POST" "/api/later" "(:title \"no id\")") '(400 "body.id is required")))
+    (should (equal (funcall call "DELETE" "/api/later/abcdefghijk") '(200 nil)))
+    (should (equal (car (funcall call "PATCH" "/api/later")) 405))
+    (should (equal (car (funcall call "GET" "/api/nothing")) 404))))
 
 (ert-deftest parens-server-failure-falls-back ()
   (parens-test-start)
