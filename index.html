@@ -24,8 +24,8 @@
       //
       // elisp-react lets Lisp change the DOM and hear events of the elements
       // it rendered, and nothing more.  This script does what Lisp cannot:
-      // the address (#/watch?v=...), keys pressed anywhere, the title, the
-      // clipboard, the YouTube player, "the end of the list is in view", the
+      // keys pressed anywhere, the clipboard, the YouTube player, "the end
+      // of the list is in view", the
       // width of the window, and keeping the keyboard inside a dialog.  It
       // holds no logic of the application: it passes messages.
       //
@@ -33,10 +33,10 @@
       // cannot load a script of the project by its URL.
       (() => {
         "use strict";
-        // elisp-studio's preview is a srcdoc frame: it has no address.
+        // elisp-studio's preview is a srcdoc frame.  (The address is not
+        // this script's: elisp-react keeps it, also there, and the router of
+        // nextel/nextel.el follows it.)
         const studio = location.href === "about:srcdoc";
-        let studioUrl = "#/";
-        const address = () => (studio ? studioUrl : location.hash || "#/");
         let input = null;   // #parens-port-in, once Lisp has rendered it
         let done = 0;       // the number of the last command carried out
         const narrow = matchMedia("(max-width: 1000px)");
@@ -48,7 +48,7 @@
           input.dispatchEvent(new Event("input"));
         };
         const hello = () => send({
-          type: "hello", url: address(), origin: self.origin, studio,
+          type: "hello", origin: self.origin, studio,
           isolated: Boolean(self.crossOriginIsolated), narrow: narrow.matches,
           light: matchMedia("(prefers-color-scheme: light)").matches,
         });
@@ -104,11 +104,6 @@
 
         // ---- what Lisp asks for (parens-port-send) ----
         const commands = {
-          navigate({ url }) {
-            if (studio) studioUrl = url;
-            else if (location.hash !== url) location.hash = url;
-          },
-          title({ text }) { document.title = text; },
           "scroll-top"() { window.scrollTo(0, 0); },
           copy({ text }) {
             navigator.clipboard.writeText(text).then(
@@ -179,21 +174,9 @@
         }).observe(document.body, { childList: true, subtree: true });
 
         // ---- what the visitor does outside Lisp's elements ----
-        addEventListener("hashchange", () => send({ type: "route", url: address() }));
-        // The studio's frame has no address: a link to #/... would load the
-        // studio's own page into the frame.  Keep it here and tell Lisp.
-        document.addEventListener("click", (event) => {
-          if (!studio || event.defaultPrevented || event.button !== 0
-              || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-          const link = event.target.closest?.('a[href^="#"]');
-          if (!link) return;
-          event.preventDefault();
-          studioUrl = link.getAttribute("href");
-          send({ type: "route", url: studioUrl });
-        }, true);
 
         // For the console and the tests: talk to Lisp, reach the player.
-        window.parensPort = Object.freeze({ send, player, address });
+        window.parensPort = Object.freeze({ send, player });
 
         const KEYS = new Set(["/", "?", "Escape", "k", "j", "l"]);
         document.addEventListener("keydown", (event) => {
@@ -220,6 +203,14 @@
     </script>
 
     <!-- The program: loaded in this order, in one Emacs. -->
+    <!-- The framework (nextel/) and the types the server shares (shared/):
+         tools/nextel.mjs writes this list. -->
+    <!-- nextel:framework -->
+    <script type="text/emacs-lisp" src="nextel/nextel-schema.el"></script>
+    <script type="text/emacs-lisp" src="nextel/nextel-route.el"></script>
+    <script type="text/emacs-lisp" src="nextel/nextel.el"></script>
+    <script type="text/emacs-lisp" src="shared/parens-types.el"></script>
+    <!-- /nextel:framework -->
     <script type="text/emacs-lisp" src="lisp/parens-util.el"></script>
     <script type="text/emacs-lisp" src="lisp/parens-port.el"></script>
     <script type="text/emacs-lisp" src="lisp/parens-data.el"></script>
@@ -227,7 +218,19 @@
     <script type="text/emacs-lisp" src="lisp/parens-state.el"></script>
     <script type="text/emacs-lisp" src="lisp/parens-ui.el"></script>
     <script type="text/emacs-lisp" src="lisp/parens-pages.el"></script>
-    <script type="text/emacs-lisp" src="lisp/parens-app.el"></script>
+    <!-- The pages (pages/: a file is an address) and nextel/routes.el, which
+         mounts the application: tools/nextel.mjs writes this list. -->
+    <!-- nextel:pages -->
+    <script type="text/emacs-lisp" src="pages/_layout.el"></script>
+    <script type="text/emacs-lisp" src="pages/404.el"></script>
+    <script type="text/emacs-lisp" src="pages/channel/[id].el"></script>
+    <script type="text/emacs-lisp" src="pages/feed/history.el"></script>
+    <script type="text/emacs-lisp" src="pages/index.el"></script>
+    <script type="text/emacs-lisp" src="pages/playlist.el"></script>
+    <script type="text/emacs-lisp" src="pages/results.el"></script>
+    <script type="text/emacs-lisp" src="pages/watch.el"></script>
+    <script type="text/emacs-lisp" src="nextel/routes.el"></script>
+    <!-- /nextel:pages -->
     <script type="module" src="https://modeverv.github.io/elisp-react/js/elisp-react.js"></script>
   </body>
 </html>

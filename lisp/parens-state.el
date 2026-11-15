@@ -1,15 +1,16 @@
 ;;; parens-state.el --- the application's own state: route, settings, library  -*- lexical-binding: t; -*-
 
-;; The state that many components need (the route, the settings, history
-;; and "watch later") lives in the `App' component.  elisp-react has no
-;; context and no store, so the mounted App is kept in `parens-app' and
-;; the functions below read and change its state from anywhere: a card's
-;; button, a message from the page, a keyboard shortcut.
+;; The state that many components need (the settings, history and "watch
+;; later") lives in the `Layout' component (pages/_layout.el), which stays
+;; mounted from one page to the next.  The mounted Layout is kept in
+;; `parens-app' and the functions below read and change its state from
+;; anywhere: a card's button, a message from the page, a keyboard shortcut.
+;; The route is the router's (nextel/nextel.el): the address is the truth.
 
 (require 'seq)
 (require 'subr-x)
 
-(defvar parens-app nil "The mounted `App' instance.")
+(defvar parens-app nil "The mounted `Layout' instance.")
 
 (defconst parens-default-settings '(:lang ja :theme dark :autoplay t))
 
@@ -37,77 +38,32 @@ sidebar is then a drawer over the page.  Lisp cannot ask the window.")
     ('server (parens-t (if long 'mode-server-long 'mode-server)))
     (_ (parens-t (if long 'mode-curated-long 'mode-curated)))))
 
-;;;; Routes
+;;;; Addresses
 
-(defun parens-route-url (route)
-  "The address (a #fragment) of ROUTE, a plist (:page PAGE ...)."
-  (pcase (plist-get route :page)
-    ('watch (concat "#/watch?v=" (url-hexify-string (plist-get route :v))
-                    (let ((start (plist-get route :t)))
-                      (if (and start (> start 0)) (format "&t=%d" start) ""))))
-    ('results (concat "#/results?search_query=" (url-hexify-string (or (plist-get route :q) ""))))
-    ('channel (concat "#/channel/" (url-hexify-string (plist-get route :id))))
-    ('history "#/feed/history")
-    ('later "#/playlist?list=WL")
-    (_ "#/")))
-
-(defun parens-watch-route (id &optional start)
-  (list :page 'watch :v id :t start))
-
-(defun parens-channel-route (channel-id)
-  (and channel-id (list :page 'channel :id channel-id)))
+;; A page's address is its file (pages/): these build the links.
 
 (defconst parens-video-id-regexp "\\`[A-Za-z0-9_-]\\{11\\}\\'")
 (defconst parens-channel-id-regexp "\\`UC[A-Za-z0-9_-]\\{22\\}\\'")
 
-(defun parens-query (text)
-  "The parameters of the query string TEXT: ((NAME . VALUE) ...)."
-  (mapcar (lambda (pair)
-            (let ((cut (string-search "=" pair)))
-              (if cut
-                  (cons (parens-decode (substring pair 0 cut)) (parens-decode (substring pair (1+ cut))))
-                (cons (parens-decode pair) ""))))
-          (split-string text "&" t)))
+(defun parens-watch-href (id &optional start)
+  "The address of the watch page of the video ID, from START seconds."
+  (nextel-href "/watch" :v id :t (and start (> start 0) start)))
 
-(defun parens-route-parse (url)
-  "The route of URL (\"#/watch?v=ID\"); the home page for anything else."
-  (let* ((text (string-remove-prefix "#" (or url "")))
-         (question (string-search "?" text))
-         (path (split-string (if question (substring text 0 question) text) "/" t))
-         (query (and question (parens-query (substring text (1+ question)))))
-         (parameter (lambda (name) (cdr (assoc name query)))))
-    (pcase path
-      (`("watch")
-       (let ((id (funcall parameter "v")))
-         (if (and id (string-match-p parens-video-id-regexp id))
-             (parens-watch-route id (parens-number (string-remove-suffix "s" (or (funcall parameter "t") ""))))
-           '(:page home))))
-      (`("results")
-       (let ((query (string-trim (or (funcall parameter "search_query") ""))))
-         (if (string-empty-p query) '(:page home) (list :page 'results :q query))))
-      (`("channel" ,id)
-       (if (string-match-p parens-channel-id-regexp id) (list :page 'channel :id id) '(:page home)))
-      (`("feed" "history") '(:page history))
-      (`("playlist") (if (equal (funcall parameter "list") "WL") '(:page later) '(:page home)))
-      (_ '(:page home)))))
+(defun parens-channel-href (channel-id)
+  "The address of the page of CHANNEL-ID, or of the home page without one."
+  (if channel-id (nextel-href "/channel/[id]" :id channel-id) (nextel-href "/")))
 
-(defun parens-show (route)
-  "Show ROUTE (the page's address has changed already, or there is none)."
-  (unless (equal route (parens-app-state :route))
-    (parens-app-set :route route :dialog nil)
+(defun parens-navigated (_route)
+  "A new page is shown (`nextel-navigate-functions')."
+  (when parens-app
+    (parens-app-set :dialog nil)
     ;; A drawer closes when a page is chosen; a sidebar beside the page stays.
     (when parens-narrow (parens-app-set :sidebar nil))
-    (parens-port-send "scroll-top")
     ;; The keyboard starts again at the top of the new page.
-    (when parens-app (react-focus parens-app "content"))
-    ;; The studio's preview has no address: remember where it was, so that
-    ;; restarting the application (a change of index.html) comes back here.
-    (when parens-studio (react-storage-set "parens/studio-route" route))))
+    (react-focus parens-app "content"))
+  (parens-port-send "scroll-top"))
 
-(defun parens-go (route)
-  "Go to ROUTE: change the page's address (the page's script) and show it."
-  (parens-port-send "navigate" :url (parens-route-url route))
-  (parens-show route))
+(add-hook 'nextel-navigate-functions #'parens-navigated)
 
 ;;;; Settings
 
@@ -136,6 +92,8 @@ it, only until the page is closed."
     (parens-library-remember (parens-app-state :later))
     (parens-start-source)
     (parens-app-set :dialog nil)
+    ;; What the pages loaded came from the old source.
+    (nextel-reload)
     (parens-changed)))
 
 (defun parens-start-source ()
@@ -153,9 +111,10 @@ allow keeping data fetched without signing in for 30 days.")
 (defun parens--entry (id)
   "What the library keeps of the video ID: enough for a card."
   (let ((video (parens-video id)))
-    (list :id id :title (plist-get video :title) :channel (parens-channel-name video)
-          :channel-id (plist-get video :channel-id) :thumbnail (plist-get video :thumbnail)
-          :duration (plist-get video :duration) :saved (float-time))))
+    (make-parens-later-entry
+     :id id :title (plist-get video :title) :channel (parens-channel-name video)
+     :channel-id (plist-get video :channel-id) :thumbnail (plist-get video :thumbnail)
+     :duration (plist-get video :duration) :saved (float-time))))
 
 (defun parens-library-remember (entries)
   (dolist (entry entries)
@@ -178,6 +137,28 @@ Old ones are removed from localStorage too, not only from the page."
   (react-storage-set (concat "parens/" (substring (symbol-name key) 1)) entries)
   (parens-app-set key entries))
 
+;; With server.el, "watch later" is the server's (api/later.el): the same
+;; in every browser.  The page asks it and sends it changes, and the
+;; entries cross as `parens-later-entry' records (shared/parens-types.el),
+;; checked on both sides.  localStorage keeps a copy.
+
+(defun parens--later-answer (entries)
+  (parens-library-remember entries)
+  (parens--library-store :later entries))
+
+(defun parens-later-sync ()
+  "In the server mode, take the list of \"watch later\" from the server."
+  (when (eq parens-mode 'server)
+    (funcall (nextel-request "GET" "/api/later" :returns '(list-of parens-later-entry))
+             #'parens--later-answer
+             (lambda (failure) (message "parens: watch later: %s" (parens-failure-text failure))))))
+
+(defun parens--later-send (request)
+  "In the server mode, send REQUEST (a `nextel-request') to the server."
+  (when (eq parens-mode 'server)
+    (funcall request #'parens--later-answer
+             (lambda (failure) (parens-toast (parens-failure-text failure))))))
+
 (defun parens--library-without (entries id)
   (seq-remove (lambda (entry) (equal (plist-get entry :id) id)) entries))
 
@@ -195,12 +176,20 @@ Old ones are removed from localStorage too, not only from the page."
 
 (defun parens-toggle-later (id)
   (if (parens-later-p id)
-      (parens--library-store :later (parens--library-without (parens-app-state :later) id))
-    (parens--library-store :later (cons (parens--entry id) (parens-app-state :later)))
-    (parens-toast (parens-t 'saved-later))))
+      (progn
+        (parens--library-store :later (parens--library-without (parens-app-state :later) id))
+        (parens--later-send (nextel-request "DELETE" "/api/later/[id]" :id id
+                                          :returns '(list-of parens-later-entry))))
+    (let ((entry (parens--entry id)))
+      (parens--library-store :later (cons entry (parens-app-state :later)))
+      (parens-toast (parens-t 'saved-later))
+      (parens--later-send (nextel-request "POST" "/api/later" :body entry :sends 'parens-later-entry
+                                        :returns '(list-of parens-later-entry))))))
 
 (defun parens-clear-library (kind)
-  (parens--library-store (if (eq kind 'history) :history :later) nil))
+  (if (eq kind 'history)
+      (parens--library-store :history nil)
+    (dolist (entry (parens-app-state :later)) (parens-toggle-later (plist-get entry :id)))))
 
 ;;;; Dialogs and messages
 

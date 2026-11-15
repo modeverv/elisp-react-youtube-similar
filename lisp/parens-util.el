@@ -248,7 +248,7 @@ is taken apart here."
                                token)))
                       ((match-beginning 3)
                        (list 'a (list :class "hashtag"
-                                      :href (concat "#/results?search_query=" (url-hexify-string token)))
+                                      :href (nextel-href "/results" :search_query token))
                              token))
                       (t token))
                 parts))
