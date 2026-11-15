@@ -1,0 +1,9 @@
+.DS_Store
+*.elc
+node_modules/
+*~
+\#*\#
+.\#*
+# written by elisp-studio's tools: the studio's address, the server's data
+.elisp-studio.json
+.data/

@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  # The application's Lisp with a native Emacs, no browser (test/run-ert.sh).
+  # The browser test, test/e2e.mjs, needs Chrome: run it locally.
+  test:
+    name: Emacs Lisp tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: modeverv/elisp-react
+          path: elisp-react
+      - name: Install Emacs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y emacs-nox
+      - name: Test the application's Lisp
+        run: |
+          emacs --version | head -1
+          ELISP_REACT=elisp-react test/run-ert.sh
+
+  # The site is the repository itself: static files, no build step.  Without
+  # server.el's native Emacs it runs without a key (or with the visitor's).
+  pages:
+    name: Publish Pages
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- YouTube's player refuses to play without a Referer (error 153);
+         a server may send "Referrer-Policy: same-origin". -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="description" content="Parens: an experiment, a video browser written in Emacs Lisp with elisp-react. Videos come from YouTube.">
+    <title>Parens</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="boot">
+        <p class="boot-logo"><span>(▶)</span> Parens</p>
+        <p>Emacs を読み込んでいます…（初回は約 5 MB）<br>Loading Emacs… (about 5 MB on the first visit)</p>
+        <noscript>This page needs JavaScript: Emacs runs in it as WebAssembly.</noscript>
+      </div>
+    </div>
+
+    <script>
+      // The page's side of lisp/parens-port.el; read that file first.
+      //
+      // elisp-react lets Lisp change the DOM and hear events of the elements
+      // it rendered, and nothing more.  This script does what Lisp cannot:
+      // the address (#/watch?v=...), keys pressed anywhere, the title, the
+      // clipboard, the YouTube player and "the end of the list is in view".
+      // It holds no logic of the application: it passes messages.
+      //
+      // It is inline because elisp-studio's preview keeps inline scripts but
+      // cannot load a script of the project by its URL.
+      (() => {
+        "use strict";
+        // elisp-studio's preview is a srcdoc frame: it has no address.
+        const studio = location.href === "about:srcdoc";
+        let studioUrl = "#/";
+        const address = () => (studio ? studioUrl : location.hash || "#/");
+        let input = null;   // #parens-port-in, once Lisp has rendered it
+        let done = 0;       // the number of the last command carried out
+
+        // A message for Lisp: the value of the hidden input, and an "input" event.
+        const send = (message) => {
+          if (!input) return;
+          input.value = JSON.stringify(message);
+          input.dispatchEvent(new Event("input"));
+        };
+        const hello = () => send({
+          type: "hello", url: address(), origin: self.origin, studio,
+          light: matchMedia("(prefers-color-scheme: light)").matches,
+        });
+
+        // ---- the YouTube player: the IFrame API on the iframe Lisp made ----
+        let youTube = null;
+        const players = new Map();
+        const loadYouTube = () => youTube ??= new Promise((resolve) => {
+          const previous = window.onYouTubeIframeAPIReady;
+          window.onYouTubeIframeAPIReady = () => { previous?.(); resolve(window.YT); };
+          const script = document.createElement("script");
+          script.src = "https://www.youtube.com/iframe_api";
+          document.head.append(script);
+        });
+        const attachPlayer = (frame) => loadYouTube().then((YT) => {
+          if (!frame.isConnected || players.has(frame)) return;
+          const id = frame.dataset.player;
+          players.set(frame, new YT.Player(frame, {
+            host: new URL(frame.src).origin,
+            events: {
+              onStateChange: (event) => send({ type: "player", id, state: event.data }),
+              onError: (event) => send({ type: "player-error", id, code: event.data }),
+            },
+          }));
+        });
+        const player = () => {
+          for (const [frame, found] of players) {
+            if (frame.isConnected) return found;
+            players.delete(frame);
+          }
+          return null;
+        };
+
+        // ---- the end of a list in view: more results ----
+        const watcher = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) send({ type: "near-end", name: entry.target.dataset.sentinel });
+          }
+        }, { rootMargin: "800px" });
+
+        // ---- what Lisp asks for (parens-port-send) ----
+        const commands = {
+          navigate({ url }) {
+            if (studio) studioUrl = url;
+            else if (location.hash !== url) location.hash = url;
+          },
+          title({ text }) { document.title = text; },
+          "scroll-top"() { window.scrollTo(0, 0); },
+          copy({ text }) {
+            navigator.clipboard.writeText(text).then(
+              () => send({ type: "copied", ok: true }),
+              () => send({ type: "copied", ok: false }));
+          },
+          player({ func, args = [] }) {
+            const found = player();
+            if (!found?.getPlayerState) return;
+            if (func === "toggle") {
+              if (found.getPlayerState() === 1) found.pauseVideo(); else found.playVideo();
+            } else if (func === "seekBy") {
+              found.seekTo(found.getCurrentTime() + args[0], true);
+            } else if (["seekTo", "playVideo", "pauseVideo"].includes(func)) {
+              found[func](...args);
+            }
+          },
+        };
+        const run = (element) => {
+          const seq = Number(element.dataset.seq);
+          if (!(seq > done)) return false;
+          done = seq;
+          try {
+            const command = JSON.parse(element.dataset.cmd);
+            commands[command.cmd]?.(command);
+          } catch (error) {
+            console.error("[parens-port]", error);
+          }
+          return true;
+        };
+
+        // Everything Lisp puts on the page passes here.
+        new MutationObserver((records) => {
+          let ran = false;
+          for (const record of records) {
+            for (const node of record.addedNodes) {
+              if (node.nodeType !== 1) continue;
+              for (const element of [node, ...node.querySelectorAll("#parens-port-in, #parens-port > data, [data-sentinel], iframe[data-player]")]) {
+                if (element.id === "parens-port-in") {
+                  if (element !== input) { input = element; hello(); }
+                } else if (element.matches("#parens-port > data")) {
+                  ran = run(element) || ran;
+                } else if (element.matches("[data-sentinel]")) {
+                  watcher.observe(element);
+                } else if (element.matches("iframe[data-player]")) {
+                  attachPlayer(element);
+                }
+              }
+            }
+          }
+          if (ran) send({ type: "ack", seq: done });
+        }).observe(document.body, { childList: true, subtree: true });
+
+        // ---- what the visitor does outside Lisp's elements ----
+        addEventListener("hashchange", () => send({ type: "route", url: address() }));
+        // The studio's frame has no address: a link to #/... would load the
+        // studio's own page into the frame.  Keep it here and tell Lisp.
+        document.addEventListener("click", (event) => {
+          if (!studio || event.defaultPrevented || event.button !== 0
+              || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          const link = event.target.closest?.('a[href^="#"]');
+          if (!link) return;
+          event.preventDefault();
+          studioUrl = link.getAttribute("href");
+          send({ type: "route", url: studioUrl });
+        }, true);
+        // For the console and the tests: talk to Lisp, reach the player.
+        window.parensPort = Object.freeze({ send, player, address });
+
+        const KEYS = new Set(["/", "?", "Escape", "k", "j", "l"]);
+        document.addEventListener("keydown", (event) => {
+          if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing || !KEYS.has(event.key)) return;
+          const field = Boolean(event.target.closest?.("input, textarea, select, [contenteditable]"));
+          if (field && event.key !== "Escape") return;
+          // Lisp answers too late to decide whether "/" types itself.
+          if (!field && event.key === "/") event.preventDefault();
+          send({ type: "key", key: event.key, field });
+        });
+      })();
+    </script>
+
+    <!-- The program: loaded in this order, in one Emacs. -->
+    <script type="text/emacs-lisp" src="lisp/parens-util.el"></script>
+    <script type="text/emacs-lisp" src="lisp/parens-port.el"></script>
+    <script type="text/emacs-lisp" src="lisp/parens-data.el"></script>
+    <script type="text/emacs-lisp" src="lisp/parens-source.el"></script>
+    <script type="text/emacs-lisp" src="lisp/parens-state.el"></script>
+    <script type="text/emacs-lisp" src="lisp/parens-ui.el"></script>
+    <script type="text/emacs-lisp" src="lisp/parens-pages.el"></script>
+    <script type="text/emacs-lisp" src="lisp/parens-app.el"></script>
+    <script type="module" src="https://modeverv.github.io/elisp-react/js/elisp-react.js"></script>
+  </body>
+</html>
