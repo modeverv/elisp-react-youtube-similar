@@ -15,7 +15,7 @@ An experiment on the branch `experiment/next-routing`: how close can an elisp-re
 | A link | `<Link href>` | `(Link (:href (nextel-href "/watch" :v id)) ...)` |
 | An API | `app/api/later/route.js` exports `GET`, `POST` | `api/later.el` has `(nextel-handle "GET" ...)`, `(nextel-handle "POST" ...)` |
 | Types shared by both | TypeScript types in a shared file | `shared/*.el` with `nextel-defschema`; checked at run time on both sides |
-| Finding the routes | the dev server watches `app/` | `node tools/nextel.mjs [--watch]` writes `nextel/routes.el` and the `<script>` tags |
+| Finding the routes | the dev server watches `app/` | Emacs writes `nextel/routes.el` and the `<script>` tags: `M-x nextel-write-routes`, or at every save with `nextel-routes-mode` |
 
 ## A page
 
@@ -34,7 +34,15 @@ An experiment on the branch `experiment/next-routing`: how close can an elisp-re
 
 The address is in the hash by default (`#/channel/UC...`): any static host serves that, and elisp-studio's preview too. `nextel-url-mode` `path` uses `/channel/UC...` (links then go through Lisp; a server has to send `index.html` for every route).
 
-`tools/nextel.mjs` reads `pages/` and writes which pattern is which page (`nextel/routes.el`) and the `<script>` tags between `<!-- nextel:pages -->` and `<!-- /nextel:pages -->` in `index.html`. The page cannot list a directory, so this has to be written; `--watch` keeps doing it while you work, and `--check` fails in CI when it is stale. A page's file names its component (`(nextel-page WatchPage`), as Next.js's file exports one: elisp-react loads each file under a name made of its URL, so a file cannot learn its own path.
+`nextel/nextel-build.el` reads `pages/` and writes which pattern is which page (`nextel/routes.el`) and the `<script>` tags between `<!-- nextel:pages -->` and `<!-- /nextel:pages -->` in `index.html`. The page cannot list a directory, so this has to be written. It is Lisp, so it runs where you edit, elisp-studio's page included, where there is no Node:
+
+```
+M-x load-file RET nextel/nextel-build.el RET    once per session
+M-x nextel-write-routes                         after adding, removing or renaming a page
+M-x nextel-routes-mode                          at every save of a file of pages/, api/ or shared/
+```
+
+A file it changes that a buffer visits is changed through that buffer (one with unsaved changes is left alone, and it says so). Outside Emacs, `tools/nextel-routes.sh` runs the same in batch: `--watch` for another editor, `--check` in CI. A page's file names its component (`(nextel-page WatchPage`), as Next.js's file exports one: elisp-react loads each file under a name made of its URL, so a file cannot learn its own path.
 
 ## The server
 

@@ -3,7 +3,7 @@
 ;; The layout (nextel/nextel.el) stays mounted from one page to the next: it
 ;; holds what every page needs (the settings, history and "watch later")
 ;; and gets the page of the address as its :children.  Which page that is
-;; comes from the file names of pages/ (tools/nextel.mjs).
+;; comes from the file names of pages/ (nextel/nextel-build.el).
 
 (require 'seq)
 (require 'subr-x)

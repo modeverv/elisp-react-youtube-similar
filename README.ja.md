@@ -58,7 +58,9 @@ index.html                ページ: Lisp ファイルの読み込み順と「�
 nextel/                   フレームワーク: nextel.el（ルーター、ページ、リンク、リクエスト）、
                           nextel-schema.el（型）、nextel-route.el（アドレス）、
                           nextel-server.el（server.el 用の api/）、routes.el（生成）
-tools/nextel.mjs          pages/ を読み、nextel/routes.el と index.html のページのスクリプトを書く
+nextel/nextel-build.el    pages/ を読み、nextel/routes.el と index.html のページのスクリプトを書く。
+                          Emacs の中で（M-x nextel-write-routes、nextel-routes-mode）
+tools/nextel-routes.sh    同じことをバッチで。npm と CI 用（--check、--watch）
 pages/_layout.el          全ページを囲む: ヘッダー、サイドバー、ダイアログ、メッセージ
 pages/index.el            /                    トップ
 pages/watch.el            /watch?v=ID&t=S      動画
@@ -97,7 +99,8 @@ Parens を書いた当時、elisp-react が Lisp に与えるのは DOM とそ�
 ## テスト
 
 ```sh
-npm run routes       # tools/nextel.mjs: ページを足す・消す・名前を変えたあとに（routes:watch は自動で続ける）
+npm run routes       # tools/nextel-routes.sh: ページを足す・消す・名前を変えたあとに（routes:watch は自動で続ける）。
+                     # Emacs（elisp-studio のものも）では M-x nextel-write-routes か M-x nextel-routes-mode
 npm run test:lisp    # test/run-ert.sh: ネイティブ Emacs でアプリケーション全体（react.el は ../elisp-react か $ELISP_REACT、
                      # app-server.el は ../elisp-studio か $ELISP_STUDIO）
 npm run test:e2e     # test/e2e.mjs: ヘッドレス Chrome、オフライン（YouTube はフィクスチャ）

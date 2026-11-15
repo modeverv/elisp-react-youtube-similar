@@ -5,8 +5,8 @@
   "type": "module",
   "description": "Parens: a YouTube-like video browser written in Emacs Lisp with elisp-react, to find out what elisp-react and elisp-studio lack",
   "scripts": {
-    "routes": "node tools/nextel.mjs",
-    "routes:watch": "node tools/nextel.mjs --watch",
+    "routes": "tools/nextel-routes.sh",
+    "routes:watch": "tools/nextel-routes.sh --watch",
     "test": "npm run test:lisp && npm run test:e2e",
     "test:lisp": "test/run-ert.sh",
     "test:e2e": "node test/e2e.mjs",

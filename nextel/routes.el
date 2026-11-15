@@ -1,6 +1,7 @@
 ;;; routes.el --- which page is which address  -*- lexical-binding: t; -*-
 
-;; Written by tools/nextel.mjs from pages/: do not edit, run it again.
+;; Written by nextel/nextel-build.el from pages/: do not edit, write it
+;; again (M-x nextel-write-routes, or tools/nextel-routes.sh).
 ;;
 ;; The server's routes, from api/ (nextel/nextel-server.el reads that directory itself):
 ;;   /api/later/[id]  api/later/[id].el

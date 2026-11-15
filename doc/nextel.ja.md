@@ -15,7 +15,7 @@
 | リンク | `<Link href>` | `(Link (:href (nextel-href "/watch" :v id)) ...)` |
 | API | `app/api/later/route.js` が `GET`、`POST` を export | `api/later.el` に `(nextel-handle "GET" ...)`、`(nextel-handle "POST" ...)` |
 | 両側で共有する型 | 共有ファイルの TypeScript の型 | `shared/*.el` の `nextel-defschema`。両側で実行時に検査 |
-| ルートの発見 | 開発サーバーが `app/` を監視 | `node tools/nextel.mjs [--watch]` が `nextel/routes.el` と `<script>` タグを書く |
+| ルートの発見 | 開発サーバーが `app/` を監視 | Emacs が `nextel/routes.el` と `<script>` タグを書く。`M-x nextel-write-routes`、または `nextel-routes-mode` で保存のたびに |
 
 ## ページ
 
@@ -34,7 +34,15 @@
 
 アドレスは既定ではハッシュに入ります（`#/channel/UC...`）。どの静的ホストでも、elisp-studio のプレビューでも動きます。`nextel-url-mode` を `path` にすると `/channel/UC...` になります（そのときリンクは Lisp が辿り、サーバーはどのルートにも `index.html` を返す必要があります）。
 
-`tools/nextel.mjs` は `pages/` を読み、どのパターンがどのページか（`nextel/routes.el`）と、`index.html` の `<!-- nextel:pages -->` と `<!-- /nextel:pages -->` の間の `<script>` タグを書きます。ページはディレクトリを一覧できないので、書き出しが必要です。`--watch` は作業中に書き続け、`--check` は古いときに CI で失敗させます。ページのファイルは自分のコンポーネントに名前を付けます（`(nextel-page WatchPage`）。Next.js のファイルが export するのと同じです。elisp-react は各ファイルを URL から作った名前で読み込むので、ファイルは自分のパスを知ることができません。
+`nextel/nextel-build.el` は `pages/` を読み、どのパターンがどのページか（`nextel/routes.el`）と、`index.html` の `<!-- nextel:pages -->` と `<!-- /nextel:pages -->` の間の `<script>` タグを書きます。ページはディレクトリを一覧できないので、書き出しが必要です。Lisp なので、編集している場所で動きます。Node のない elisp-studio のページの中でも使えます。
+
+```
+M-x load-file RET nextel/nextel-build.el RET    セッションごとに1回
+M-x nextel-write-routes                         ページを足す・消す・名前を変えたあと
+M-x nextel-routes-mode                          pages/、api/、shared/ のファイルを保存するたびに
+```
+
+書き換えるファイルをバッファが開いていれば、そのバッファを通して書き換えます（保存していない変更があるバッファには触れず、そう伝えます）。Emacs の外では `tools/nextel-routes.sh` が同じことをバッチで行います。`--watch` は別のエディタ用、`--check` は CI 用です。ページのファイルは自分のコンポーネントに名前を付けます（`(nextel-page WatchPage`）。Next.js のファイルが export するのと同じです。elisp-react は各ファイルを URL から作った名前で読み込むので、ファイルは自分のパスを知ることができません。
 
 ## サーバー
 

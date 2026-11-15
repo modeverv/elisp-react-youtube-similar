@@ -21,7 +21,7 @@
 (defvar parens-test-build (make-temp-file "parens-test-" t))
 
 (defun parens-test-files ()
-  "The Lisp files of index.html, in its order (tools/nextel.mjs lists the
+  "The Lisp files of index.html, in its order (nextel-build.el lists the
 framework, shared/ and pages/ there)."
   (with-temp-buffer
     (insert-file-contents (expand-file-name "index.html" parens-test-root))

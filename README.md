@@ -58,7 +58,9 @@ index.html                the page: the Lisp files in order, and the "port" scri
 nextel/                   the framework: nextel.el (router, pages, links, requests),
                           nextel-schema.el (types), nextel-route.el (addresses),
                           nextel-server.el (api/ for server.el), routes.el (written)
-tools/nextel.mjs          reads pages/, writes nextel/routes.el and index.html's page scripts
+nextel/nextel-build.el    reads pages/, writes nextel/routes.el and index.html's page scripts,
+                          in Emacs (M-x nextel-write-routes, nextel-routes-mode)
+tools/nextel-routes.sh    the same in batch, for npm and CI (--check, --watch)
 pages/_layout.el          around every page: the header, the sidebar, the dialogs, messages
 pages/index.el            /                    the home page
 pages/watch.el            /watch?v=ID&t=S      a video
@@ -97,7 +99,8 @@ The script has no logic of the application: keys are interpreted and the player 
 ## Tests
 
 ```sh
-npm run routes       # tools/nextel.mjs: after adding, removing or renaming a page (routes:watch keeps doing it)
+npm run routes       # tools/nextel-routes.sh: after adding, removing or renaming a page (routes:watch keeps doing it);
+                     # in Emacs, also elisp-studio's: M-x nextel-write-routes, or M-x nextel-routes-mode
 npm run test:lisp    # test/run-ert.sh: the application in a native Emacs (react.el from ../elisp-react or $ELISP_REACT,
                      # app-server.el from ../elisp-studio or $ELISP_STUDIO)
 npm run test:e2e     # test/e2e.mjs: headless Chrome, offline (fixtures for YouTube)

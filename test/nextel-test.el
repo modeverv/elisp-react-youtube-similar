@@ -180,6 +180,93 @@ an application set them (Parens' are put back afterwards)."
         (react-testing-click (react-testing-find :class "home"))
         (should (equal (car (last (nextel-test-told "navigate"))) '(:url "/app/" :replace nil)))))
 
+;;;; Writing the routes
+
+(ert-deftest nextel-build-routes ()
+  "nextel-build.el writes routes.el and the page's scripts from pages/,
+through a buffer that visits a file, and at a save with `nextel-routes-mode'."
+  (load (expand-file-name "nextel/nextel-build.el" nextel-test-root) nil t)
+  (let* ((root (file-name-as-directory (make-temp-file "nextel-build" t)))
+         (file (lambda (name) (expand-file-name name root)))
+         (write (lambda (name text)
+                  (make-directory (file-name-directory (funcall file name)) t)
+                  (with-temp-file (funcall file name) (insert text))))
+         (routes (lambda () (nextel--file-text (funcall file "nextel/routes.el")))))
+    (funcall write "index.html" "<html>\n  <body>\n    <!-- nextel:framework -->\n    <!-- /nextel:framework -->\n    <script type=\"text/emacs-lisp\" src=\"lisp/app.el\"></script>\n    <!-- nextel:pages -->\n    <!-- /nextel:pages -->\n  </body>\n</html>\n")
+    (funcall write "pages/index.el" ";;; -*- lexical-binding: t; -*-\n(nextel-page Home\n  :render (lambda (_self) \"home\"))\n")
+    (funcall write "pages/items/[id].el" "(nextel-page\n  ItemPage)")
+    (funcall write "pages/_layout.el" "(nextel-layout Frame)")
+    (funcall write "pages/404.el" "(nextel-page Missing)")
+    (funcall write "pages/_parts/card.el" "(defun card ())")
+    (funcall write "pages/.#index.el" "a lock file")
+    (funcall write "api/items.el" "")
+    (funcall write "api/_db.el" "")
+    (funcall write "shared/types.el" "")
+    (make-directory (funcall file "nextel") t)
+    (should (equal (nextel-write-routes root) '("nextel/routes.el" "index.html")))
+    (should (equal (nextel--file-text (funcall file "index.html")) "<html>
+  <body>
+    <!-- nextel:framework -->
+    <script type=\"text/emacs-lisp\" src=\"nextel/nextel-schema.el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"nextel/nextel-route.el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"nextel/nextel.el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"shared/types.el\"></script>
+    <!-- /nextel:framework -->
+    <script type=\"text/emacs-lisp\" src=\"lisp/app.el\"></script>
+    <!-- nextel:pages -->
+    <script type=\"text/emacs-lisp\" src=\"pages/_layout.el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"pages/_parts/card.el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"pages/404.el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"pages/index.el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"pages/items/[id].el\"></script>
+    <script type=\"text/emacs-lisp\" src=\"nextel/routes.el\"></script>
+    <!-- /nextel:pages -->
+  </body>
+</html>
+"))
+    (should (string-match-p (regexp-quote "(nextel-define-routes
+ '((\"/items/[id]\" . ItemPage)
+   (\"/\" . Home))
+ :layout 'Frame
+ :not-found 'Missing)
+
+(nextel-start \"#app\")") (funcall routes)))
+    (should (string-match-p ";;   /api/items +api/items.el" (funcall routes)))
+    (should-not (string-match-p "_db" (funcall routes)))
+    ;; Nothing to write the second time.
+    (should (null (nextel-write-routes root)))
+    ;; A buffer that visits index.html follows; one with changes that are
+    ;; not saved is left alone.
+    (let ((buffer (find-file-noselect (funcall file "index.html"))))
+      (funcall write "pages/about.el" "(nextel-page About)")
+      (nextel-write-routes root)
+      (with-current-buffer buffer
+        (should (string-match-p "pages/about.el" (buffer-string)))
+        (should-not (buffer-modified-p)))
+      (funcall write "pages/contact.el" "(nextel-page Contact)")
+      (with-current-buffer buffer (goto-char (point-max)) (insert "<!-- mine -->"))
+      (should-error (nextel-write-routes root))
+      (should-not (string-match-p "contact" (nextel--file-text (funcall file "index.html"))))
+      (with-current-buffer buffer (set-buffer-modified-p nil))
+      (kill-buffer buffer))
+    ;; With the mode, a page is written in when it is saved.
+    (nextel-routes-mode 1)
+    (unwind-protect
+        (with-current-buffer (find-file-noselect (funcall file "pages/news.el"))
+          (insert "(nextel-page News)")
+          (save-buffer)
+          (kill-buffer))
+      (nextel-routes-mode -1))
+    (should (string-match-p "(\"/news\" . News)" (funcall routes)))
+    (should (string-match-p "(\"/contact\" . Contact)" (funcall routes)))
+    ;; Two files of one address, and a page that names no component.
+    (funcall write "pages/news/index.el" "(nextel-page News2)")
+    (should (string-match-p "pages/news.el and pages/news/index.el are both /news"
+                            (cadr (should-error (nextel-write-routes root)))))
+    (delete-file (funcall file "pages/news/index.el"))
+    (funcall write "pages/broken.el" "(defun broken ())")
+    (should (string-match-p "pages/broken.el has no (nextel-page NAME" (cadr (should-error (nextel-write-routes root)))))))
+
 ;;;; Requests
 
 (ert-deftest nextel-request ()

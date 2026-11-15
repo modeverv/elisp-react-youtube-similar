@@ -65,8 +65,11 @@ fixed segments before parameters, parameters before [...rest]."
     (while (and ra rb (= (car ra) (car rb)))
       (setq ra (cdr ra) rb (cdr rb)))
     (cond ((and ra rb) (< (car ra) (car rb)))
-          ;; Of two that agree as far as both go, the longer first.
-          (t (and ra (not rb))))))
+          ;; Of two that agree as far as both go, the longer first; of two
+          ;; alike, the one first in the alphabet (any order is right, one
+          ;; order is written the same everywhere).
+          ((or ra rb) (and ra t))
+          (t (string< a b)))))
 
 (defun nextel--value-text (value)
   (cond ((stringp value) value)

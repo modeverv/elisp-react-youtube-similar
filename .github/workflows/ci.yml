@@ -25,15 +25,12 @@ jobs:
         with:
           repository: modeverv/elisp-studio
           path: elisp-studio
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-      - name: The routes are written from pages/
-        run: node tools/nextel.mjs --check
       - name: Install Emacs
         run: |
           sudo apt-get update
           sudo apt-get install -y emacs-nox
+      - name: The routes are written from pages/
+        run: tools/nextel-routes.sh --check
       - name: Test the application's Lisp
         run: |
           emacs --version | head -1

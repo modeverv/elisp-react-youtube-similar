@@ -25,11 +25,12 @@
 ;; which stays mounted from one page to the next and gets the page as its
 ;; :children; pages/404.el is the page of an address that no file has.
 ;;
-;; tools/nextel.mjs reads pages/ and writes nextel/routes.el (which page is
-;; which pattern) and the <script> tags in index.html.  Run it after
-;; adding, removing or renaming a page; node tools/nextel.mjs --watch keeps
-;; doing it.  elisp-studio reloads a page file that was saved, as any
-;; other file, and keeps the state.
+;; nextel-build.el reads pages/ and writes nextel/routes.el (which page is
+;; which pattern) and the <script> tags in index.html, in the Emacs you
+;; edit with (elisp-studio's too): M-x nextel-write-routes after adding,
+;; removing or renaming a page, or M-x nextel-routes-mode to do it at
+;; every save; tools/nextel-routes.sh in batch.  elisp-studio reloads a page
+;; file that was saved, as any other file, and keeps the state.
 ;;
 ;; The address is in the hash by default (#/watch?v=ID): that works on any
 ;; static host and in elisp-studio's preview.  `nextel-url-mode' `path' puts
@@ -82,7 +83,7 @@ changed, `nextel-refresh'.")
 
 (defun nextel-define-routes (routes &rest options)
   "Take ROUTES, ((PATTERN . PAGE) ...), with OPTIONS :layout and :not-found.
-nextel/routes.el, which tools/nextel.mjs writes, calls this."
+nextel/routes.el, which nextel-build.el writes, calls this."
   (setq nextel-routes (sort (copy-sequence routes) (lambda (a b) (nextel-pattern< (car a) (car b))))
         nextel-layout (plist-get options :layout)
         nextel-not-found (plist-get options :not-found)))
