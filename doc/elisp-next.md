@@ -19,7 +19,7 @@ pages/404.el              an address that no file has
 api/feed.el               GET /api/feed: the channels' latest uploads (api/_feeds.el)
 api/later.el              GET, POST /api/later; api/later/[id].el: DELETE: "watch later" kept by the server
 shared/parens-types.el    parens-video, parens-channel, parens-feed, parens-later-entry
-server.el                 two lines: elisp-next's nextel-server.el answers with api/
+server.el                 three lines: elisp-next's nextel-server.el answers with api/
 ```
 
 The addresses are those of the Parens before elisp-next (`#/watch?v=ID`, `#/channel/ID`): the file names were chosen to keep them, so links still work and `test/e2e.mjs` ran unchanged. After adding, removing or renaming a page: `M-x nextel-write-routes` in Emacs (`M-x load-file RET vendor/elisp-next/lisp/nextel-build.el` first; elisp-studio's too), `M-x nextel-routes-mode` to do it at every save, or `npm run routes`.

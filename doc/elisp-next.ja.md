@@ -19,7 +19,7 @@ pages/404.el              どのファイルにもないアドレス
 api/feed.el               GET /api/feed: チャンネルの最新の動画（api/_feeds.el）
 api/later.el              GET、POST /api/later。api/later/[id].el は DELETE。「後で見る」をサーバーが持つ
 shared/parens-types.el    parens-video、parens-channel、parens-feed、parens-later-entry
-server.el                 2行: elisp-next の nextel-server.el が api/ で答える
+server.el                 3行: elisp-next の nextel-server.el が api/ で答える
 ```
 
 アドレスは elisp-next 以前の Parens と同じです（`#/watch?v=ID`、`#/channel/ID`）。それが保たれるようにファイル名を選んだので、リンクはそのまま使え、`test/e2e.mjs` は変更なしで通りました。ページを足す・消す・名前を変えたあとは、Emacs で `M-x nextel-write-routes`（先に `M-x load-file RET vendor/elisp-next/lisp/nextel-build.el`。elisp-studio のものも同じ）、保存のたびに書くなら `M-x nextel-routes-mode`、または `npm run routes` です。
