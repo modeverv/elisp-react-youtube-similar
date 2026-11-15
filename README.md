@@ -51,16 +51,15 @@ Open the studio at `http://localhost:5190/...` rather than the printed `127.0.0.
 
 ## What is where
 
-This branch (`experiment/next-routing`) is written with **nextel**, a Next.js-like layer of its own over elisp-react: a file of `pages/` is an address, a file of `api/` is a route of the server, and `shared/` holds the types that both sides check. See [doc/nextel.md](doc/nextel.md) ([日本語](doc/nextel.ja.md)).
+Parens is written with [elisp-next](https://github.com/modeverv/elisp-next), a layer between React and Next.js over elisp-react, which it was taken out of: a file of `pages/` is an address, a file of `api/` is a route of the server, and `shared/` holds the types that both sides check. [doc/elisp-next.md](doc/elisp-next.md) ([日本語](doc/elisp-next.ja.md)) says how Parens uses it and what that was like.
 
 ```text
 index.html                the page: the Lisp files in order, and the "port" script (below)
-nextel/                   the framework: nextel.el (router, pages, links, requests),
-                          nextel-schema.el (types), nextel-route.el (addresses),
-                          nextel-server.el (api/ for server.el), routes.el (written)
-nextel/nextel-build.el    reads pages/, writes nextel/routes.el and index.html's page scripts,
-                          in Emacs (M-x nextel-write-routes, nextel-routes-mode)
-tools/nextel-routes.sh    the same in batch, for npm and CI (--check, --watch)
+vendor/elisp-next/        the framework, a copy of a release of elisp-next (VERSION says which;
+                          tools/update-elisp-next.sh puts another): its lisp/ and bin/nextel-routes
+routes.el                 which page is which address: written from pages/ by elisp-next,
+                          M-x nextel-write-routes or nextel-routes-mode in Emacs (elisp-studio's too),
+                          vendor/elisp-next/bin/nextel-routes in batch
 pages/_layout.el          around every page: the header, the sidebar, the dialogs, messages
 pages/index.el            /                    the home page
 pages/watch.el            /watch?v=ID&t=S      a video
@@ -73,7 +72,7 @@ api/feed.el               GET /api/feed        the channels' latest uploads (api
 api/later.el              GET, POST /api/later "watch later", kept by the server
 api/later/[id].el         DELETE /api/later/ID
 shared/parens-types.el    parens-video, parens-channel, parens-feed, parens-later-entry
-server.el                 loads nextel/nextel-server.el, which answers with api/
+server.el                 loads elisp-next's nextel-server.el, which answers with api/
 lisp/parens-util.el       words (ja/en), numbers (1.2万 / 1.2K), dates, durations, links in text
 lisp/parens-port.el       Lisp's side of the port: messages from the page, commands to it
 lisp/parens-data.el       the chosen videos and channels (identifiers only)
@@ -83,13 +82,12 @@ lisp/parens-ui.el         cards, avatars, icons, chips
 lisp/parens-pages.el      what the pages share: lists that load more, the library, the dialogs
 style.css                 the look; icons are CSS masks (elisp-react cannot draw SVG)
 test/parens-test.el       the whole application in a native Emacs, no browser (ERT)
-test/nextel-test.el       the framework: types, addresses, the router, requests, api/
 test/e2e.mjs              the page in headless Chrome, YouTube answered by fixtures
 ```
 
 ### The port
 
-When Parens was written, elisp-react gave Lisp the DOM, its events, timers, fetch and localStorage, and nothing else. It has more now: on this branch the address, the Back button and the title are elisp-react's, and nextel's router follows them. Keys pressed outside Lisp's elements, the clipboard and YouTube's player are still the port's. The script in `index.html` can, and the two talk through elements that Lisp renders ([lisp/parens-port.el](lisp/parens-port.el)):
+When Parens was written, elisp-react gave Lisp the DOM, its events, timers, fetch and localStorage, and nothing else. It has more now: the address, the Back button and the title are elisp-react's, and elisp-next's router follows them. Keys pressed outside Lisp's elements, the clipboard and YouTube's player are still the port's. The script in `index.html` can, and the two talk through elements that Lisp renders ([lisp/parens-port.el](lisp/parens-port.el)):
 
 - page → Lisp: a hidden `<input>`; the script puts a JSON message into its value and fires an `input` event;
 - Lisp → page: one `<data data-cmd="JSON">` element per command; the script sees it appear (MutationObserver), carries it out and acknowledges it.
@@ -99,7 +97,7 @@ The script has no logic of the application: keys are interpreted and the player 
 ## Tests
 
 ```sh
-npm run routes       # tools/nextel-routes.sh: after adding, removing or renaming a page (routes:watch keeps doing it);
+npm run routes       # vendor/elisp-next/bin/nextel-routes: after adding, removing or renaming a page (routes:watch keeps doing it);
                      # in Emacs, also elisp-studio's: M-x nextel-write-routes, or M-x nextel-routes-mode
 npm run test:lisp    # test/run-ert.sh: the application in a native Emacs (react.el from ../elisp-react or $ELISP_REACT,
                      # app-server.el from ../elisp-studio or $ELISP_STUDIO)

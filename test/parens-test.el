@@ -4,7 +4,7 @@
 ;; elisp-react next to this repository (../elisp-react) or $ELISP_REACT.
 ;;
 ;; The application is mounted as in the page; this file plays the page:
-;; it keeps the address (the router of nextel/nextel.el follows it),
+;; it keeps the address (the router of elisp-next follows it),
 ;; answers the port's commands, fires DOM events at elements found by
 ;; their attributes, and answers fetches with made-up YouTube data (no
 ;; network; the made-up ids are not real videos).
@@ -21,8 +21,8 @@
 (defvar parens-test-build (make-temp-file "parens-test-" t))
 
 (defun parens-test-files ()
-  "The Lisp files of index.html, in its order (nextel-build.el lists the
-framework, shared/ and pages/ there)."
+  "The Lisp files of index.html, in its order (elisp-next's nextel-build.el
+lists the framework, shared/ and pages/ there)."
   (with-temp-buffer
     (insert-file-contents (expand-file-name "index.html" parens-test-root))
     (let (files)
@@ -412,10 +412,14 @@ and changes it with requests whose bodies and answers are checked against
   (should (eq parens-mode 'curated))
   (should (string-match-p "GET /api/feed\\.videos\\[0\\]\\.views: expected number" (parens-mode-note-text))))
 
+(defconst parens-test-studio
+  (expand-file-name "lisp/app-server.el" (or (getenv "ELISP_STUDIO") (expand-file-name "../elisp-studio" parens-test-root)))
+  "elisp-studio's app-server.el, which the server side needs.")
+
 (ert-deftest parens-server-api ()
   "server.el answers with the files of api/ (a native Emacs, elisp-studio's app-server.el)."
-  (skip-unless (file-readable-p nextel-test-studio))
-  (load nextel-test-studio nil t)
+  (skip-unless (file-readable-p parens-test-studio))
+  (load parens-test-studio nil t)
   (let ((app-server-data-directory (make-temp-file "parens-test-data" t))
         (app-server-project-directory parens-test-root)
         (call (lambda (method path &optional body)

@@ -51,16 +51,15 @@ node ../elisp-studio/tools/studio.mjs .           # http://127.0.0.1:5190/elisp-
 
 ## ファイル
 
-このブランチ（`experiment/next-routing`）は、elisp-react の上に作った Next.js 風の層 **nextel** で書かれています。`pages/` のファイルがアドレス、`api/` のファイルがサーバーの経路になり、`shared/` に両側で検査する型を置きます。[doc/nextel.ja.md](doc/nextel.ja.md)（[English](doc/nextel.md)）を参照してください。
+Parens は [elisp-next](https://github.com/modeverv/elisp-next) で書かれています。elisp-react の上の、React と Next.js の中間の層で、Parens から切り出したものです。`pages/` のファイルがアドレス、`api/` のファイルがサーバーの経路になり、`shared/` に両側で検査する型を置きます。Parens での使い方と使い心地は [doc/elisp-next.ja.md](doc/elisp-next.ja.md)（[English](doc/elisp-next.md)）にあります。
 
 ```text
 index.html                ページ: Lisp ファイルの読み込み順と「ポート」のスクリプト（下記）
-nextel/                   フレームワーク: nextel.el（ルーター、ページ、リンク、リクエスト）、
-                          nextel-schema.el（型）、nextel-route.el（アドレス）、
-                          nextel-server.el（server.el 用の api/）、routes.el（生成）
-nextel/nextel-build.el    pages/ を読み、nextel/routes.el と index.html のページのスクリプトを書く。
-                          Emacs の中で（M-x nextel-write-routes、nextel-routes-mode）
-tools/nextel-routes.sh    同じことをバッチで。npm と CI 用（--check、--watch）
+vendor/elisp-next/        フレームワーク。elisp-next のリリースのコピー（どれかは VERSION。
+                          別のものは tools/update-elisp-next.sh で入れる）: lisp/ と bin/nextel-routes
+routes.el                 どのページがどのアドレスか: elisp-next が pages/ から書く。
+                          Emacs（elisp-studio のものも）では M-x nextel-write-routes か nextel-routes-mode、
+                          バッチでは vendor/elisp-next/bin/nextel-routes
 pages/_layout.el          全ページを囲む: ヘッダー、サイドバー、ダイアログ、メッセージ
 pages/index.el            /                    トップ
 pages/watch.el            /watch?v=ID&t=S      動画
@@ -73,7 +72,7 @@ api/feed.el               GET /api/feed        チャンネルの最新の動画
 api/later.el              GET, POST /api/later 「後で見る」をサーバーが持つ
 api/later/[id].el         DELETE /api/later/ID
 shared/parens-types.el    parens-video、parens-channel、parens-feed、parens-later-entry
-server.el                 nextel/nextel-server.el を読み込み、api/ で答える
+server.el                 elisp-next の nextel-server.el を読み込み、api/ で答える
 lisp/parens-util.el       言葉（日英）、数（1.2万 / 1.2K）、日付、長さ、テキスト中のリンク
 lisp/parens-port.el       ポートの Lisp 側: ページからのメッセージ、ページへのコマンド
 lisp/parens-data.el       選んだ動画とチャンネル（ID のみ）
@@ -83,13 +82,12 @@ lisp/parens-ui.el         カード、アバター、アイコン、チップ
 lisp/parens-pages.el      ページが共有するもの: 続きを読み込む一覧、ライブラリ、ダイアログ
 style.css                 見た目。アイコンは CSS マスク（elisp-react は SVG を描けない）
 test/parens-test.el       アプリケーション全体をネイティブ Emacs で（ブラウザなし、ERT）
-test/nextel-test.el       フレームワーク: 型、アドレス、ルーター、リクエスト、api/
 test/e2e.mjs              ヘッドレス Chrome でページを。YouTube はフィクスチャが答える
 ```
 
 ### ポート
 
-Parens を書いた当時、elisp-react が Lisp に与えるのは DOM とそのイベント、タイマー、fetch、localStorage だけでした。今はもっとあり、このブランチではアドレス、戻るボタン、タイトルは elisp-react のものを使い、nextel のルーターがそれに従います。自分の要素の外で押されたキー、クリップボード、YouTube のプレーヤーは、今もポートの役目です。`index.html` のスクリプトにはできるので、両者は Lisp が描く要素を通じて話します（[lisp/parens-port.el](lisp/parens-port.el)）:
+Parens を書いた当時、elisp-react が Lisp に与えるのは DOM とそのイベント、タイマー、fetch、localStorage だけでした。今はもっとあり、アドレス、戻るボタン、タイトルは elisp-react のものを使い、elisp-next のルーターがそれに従います。自分の要素の外で押されたキー、クリップボード、YouTube のプレーヤーは、今もポートの役目です。`index.html` のスクリプトにはできるので、両者は Lisp が描く要素を通じて話します（[lisp/parens-port.el](lisp/parens-port.el)）:
 
 - ページ → Lisp: 隠れた `<input>`。スクリプトが JSON のメッセージを value に入れて `input` イベントを起こす。
 - Lisp → ページ: コマンドごとに 1 つの `<data data-cmd="JSON">` 要素。スクリプトが現れたのを見て（MutationObserver）実行し、受け取りを返す。
@@ -99,7 +97,7 @@ Parens を書いた当時、elisp-react が Lisp に与えるのは DOM とそ�
 ## テスト
 
 ```sh
-npm run routes       # tools/nextel-routes.sh: ページを足す・消す・名前を変えたあとに（routes:watch は自動で続ける）。
+npm run routes       # vendor/elisp-next/bin/nextel-routes: ページを足す・消す・名前を変えたあとに（routes:watch は自動で続ける）。
                      # Emacs（elisp-studio のものも）では M-x nextel-write-routes か M-x nextel-routes-mode
 npm run test:lisp    # test/run-ert.sh: ネイティブ Emacs でアプリケーション全体（react.el は ../elisp-react か $ELISP_REACT、
                      # app-server.el は ../elisp-studio か $ELISP_STUDIO）

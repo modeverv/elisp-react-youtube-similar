@@ -5,7 +5,7 @@
 ;; mounted from one page to the next.  The mounted Layout is kept in
 ;; `parens-app' and the functions below read and change its state from
 ;; anywhere: a card's button, a message from the page, a keyboard shortcut.
-;; The route is the router's (nextel/nextel.el): the address is the truth.
+;; The route is the router's (elisp-next): the address is the truth.
 
 (require 'seq)
 (require 'subr-x)

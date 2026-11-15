@@ -1,6 +1,6 @@
 ;;; parens-pages.el --- what the pages share: lists, the library, dialogs  -*- lexical-binding: t; -*-
 
-;; The pages themselves are files of pages/ (nextel/nextel.el), one per
+;; The pages themselves are files of pages/ (elisp-next), one per
 ;; address.  A page that loads a list keeps it in its state and adds to
 ;; it: `parens-list-load' with `react-async' around the awaitables of
 ;; parens-source.el.  An async body checks, after every await, that the

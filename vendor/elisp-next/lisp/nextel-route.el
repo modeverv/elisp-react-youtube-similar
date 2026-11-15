@@ -1,5 +1,9 @@
 ;;; nextel-route.el --- addresses as file names: patterns, both ends  -*- lexical-binding: t; -*-
 
+;; Copyright (c) 2026 modeverv
+;; SPDX-License-Identifier: MIT
+;; This file is part of elisp-next: https://github.com/modeverv/elisp-next
+
 ;; A route's pattern is the path of its file without the directory and
 ;; ".el": pages/channel/[id].el is "/channel/[id]", api/videos/[id].el is
 ;; "/api/videos/[id]".  A segment in brackets is a parameter; [...rest]

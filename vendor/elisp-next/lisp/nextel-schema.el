@@ -1,5 +1,9 @@
 ;;; nextel-schema.el --- record types that the page and the server share  -*- lexical-binding: t; -*-
 
+;; Copyright (c) 2026 modeverv
+;; SPDX-License-Identifier: MIT
+;; This file is part of elisp-next: https://github.com/modeverv/elisp-next
+
 ;; Both ends of the application are Emacs Lisp, so a record's definition
 ;; can be one file that both load (shared/): what the server sends and
 ;; what the page expects are the same definition, checked at both ends

@@ -1,10 +1,10 @@
 ;;; parens-types.el --- what the page and server.el send each other  -*- lexical-binding: t; -*-
 
 ;; The page loads this file (index.html) and so does the server
-;; (nextel/nextel-server.el loads shared/): a record is checked against the
+;; (elisp-next's nextel-server.el loads shared/): a record is checked against the
 ;; same definition when the server answers and when the page reads the
 ;; answer, and when the page sends one and the server reads it.  See
-;; nextel/nextel-schema.el for the types.
+;; elisp-next's nextel-schema.el for the types.
 
 (require 'nextel-schema)
 

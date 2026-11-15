@@ -10,8 +10,8 @@ if [ ! -f "${react}/lisp/react.el" ]; then
   exit 1
 fi
 emacs="${EMACS:-$("${react}/tools/find-emacs.sh")}"
-exec "${emacs}" --batch -Q -L "${react}/lisp" -L nextel -L shared \
+exec "${emacs}" --batch -Q -L "${react}/lisp" -L vendor/elisp-next/lisp -L shared \
   --eval '(setq load-prefer-newer t)' \
-  -l react -l test/parens-test.el -l test/nextel-test.el \
+  -l react -l test/parens-test.el \
   --eval '(parens-test-load-library)' \
   -f ert-run-tests-batch-and-exit

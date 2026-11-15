@@ -1,5 +1,9 @@
 ;;; nextel.el --- files as pages: a Next.js-like layer over elisp-react  -*- lexical-binding: t; -*-
 
+;; Copyright (c) 2026 modeverv
+;; SPDX-License-Identifier: MIT
+;; This file is part of elisp-next: https://github.com/modeverv/elisp-next
+
 ;; A page is a file.  pages/index.el is "/", pages/watch.el is "/watch",
 ;; pages/channel/[id].el is "/channel/ID", with the parameter :id.  The
 ;; file says what its page is with `nextel-page', which is
@@ -25,11 +29,11 @@
 ;; which stays mounted from one page to the next and gets the page as its
 ;; :children; pages/404.el is the page of an address that no file has.
 ;;
-;; nextel-build.el reads pages/ and writes nextel/routes.el (which page is
+;; nextel-build.el reads pages/ and writes routes.el (which page is
 ;; which pattern) and the <script> tags in index.html, in the Emacs you
 ;; edit with (elisp-studio's too): M-x nextel-write-routes after adding,
 ;; removing or renaming a page, or M-x nextel-routes-mode to do it at
-;; every save; tools/nextel-routes.sh in batch.  elisp-studio reloads a page
+;; every save; bin/nextel-routes in batch.  elisp-studio reloads a page
 ;; file that was saved, as any other file, and keeps the state.
 ;;
 ;; The address is in the hash by default (#/watch?v=ID): that works on any
@@ -56,7 +60,7 @@
 (defvar nextel-base-path ""
   "In the `path' mode, the path under which the application is (\"/app\").")
 (defvar nextel-routes nil
-  "((PATTERN . PAGE) ...), in the order they are tried (nextel/routes.el).")
+  "((PATTERN . PAGE) ...), in the order they are tried (routes.el).")
 (defvar nextel-layout nil "The layout component around every page, or nil.")
 (defvar nextel-not-found nil "The page of an address that no page has, or nil.")
 (defvar nextel-stale-ms 60000 "How long a page's loaded data counts as fresh.")
@@ -83,7 +87,7 @@ changed, `nextel-refresh'.")
 
 (defun nextel-define-routes (routes &rest options)
   "Take ROUTES, ((PATTERN . PAGE) ...), with OPTIONS :layout and :not-found.
-nextel/routes.el, which nextel-build.el writes, calls this."
+routes.el, which nextel-build.el writes, calls this."
   (setq nextel-routes (sort (copy-sequence routes) (lambda (a b) (nextel-pattern< (car a) (car b))))
         nextel-layout (plist-get options :layout)
         nextel-not-found (plist-get options :not-found)))
@@ -246,7 +250,7 @@ with SPEC.  It gets the props :route and :children (the page)."
 
 (defun nextel-start (selector)
   "Show the application at SELECTOR: the router, the layout, the pages.
-nextel/routes.el calls this last."
+routes.el calls this last."
   (react-mount '(nextel-router) selector))
 
 (defun nextel-refresh ()

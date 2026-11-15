@@ -1,20 +1,24 @@
 ;;; nextel-build.el --- write the routes from pages/, in Emacs  -*- lexical-binding: t; -*-
 
+;; Copyright (c) 2026 modeverv
+;; SPDX-License-Identifier: MIT
+;; This file is part of elisp-next: https://github.com/modeverv/elisp-next
+
 ;; The page loads its Lisp from <script> tags and cannot list a directory,
-;; so which file is which address has to be written down: nextel/routes.el
-;; (the patterns and their pages) and the page's <script> tags in
+;; so which file is which address has to be written down: routes.el at the
+;; project's root (the patterns and their pages) and the page's <script> tags in
 ;; index.html.  This file writes them, in the Emacs you edit with: the
 ;; one in elisp-studio's page, your own, or one in batch.
 ;;
-;;   M-x load-file RET nextel/nextel-build.el RET   once per session
+;;   M-x load-file RET vendor/elisp-next/lisp/nextel-build.el RET   once
 ;;   M-x nextel-write-routes     after adding, removing or renaming a page
 ;;   M-x nextel-routes-mode      write them at every save of a file of
 ;;                               pages/, api/ or shared/ (a new page is
 ;;                               there as soon as it is saved)
 ;;
-;; In batch (tools/nextel-routes.sh, for npm and CI), in the project:
+;; In batch (bin/nextel-routes, for npm and CI), in the project:
 ;;
-;;   emacs --batch -l nextel/nextel-build.el -f nextel-write-routes
+;;   emacs --batch -l vendor/elisp-next/lisp/nextel-build.el -f nextel-write-routes
 ;;   ... -f nextel-check-routes   exit 1 when they are not up to date
 ;;   ... -f nextel-watch-routes   write them whenever the files change
 ;;
@@ -25,7 +29,7 @@
 ;; server reads that directory itself (nextel-server.el).  index.html has
 ;; the two places that are filled in:
 ;;
-;;   <!-- nextel:framework --> <!-- /nextel:framework -->  nextel/ and shared/
+;;   <!-- nextel:framework --> <!-- /nextel:framework -->  this directory, shared/
 ;;   <!-- nextel:pages -->     <!-- /nextel:pages -->      pages/ and routes.el
 
 ;;; Code:
@@ -34,7 +38,7 @@
 (require 'subr-x)
 
 (defconst nextel-build--here (file-name-directory (or load-file-name buffer-file-name default-directory))
-  "The directory of this file: nextel/.")
+  "The directory of this file: the framework's Lisp.")
 
 (load (expand-file-name "nextel-route.el" nextel-build--here) nil t)
 (declare-function nextel-pattern-of-file "nextel-route")
@@ -46,6 +50,18 @@
 
 (defvar nextel-mount-selector "#app"
   "Where routes.el mounts the application (`nextel-start').")
+
+(defvar nextel-routes-file "routes.el"
+  "The file, relative to the project, that `nextel-write-routes' writes.")
+
+(defun nextel--framework-directory (root)
+  "This file's directory relative to ROOT (\"vendor/elisp-next/lisp/\"),
+from where the page loads the framework: a copy of it in the project."
+  (let ((relative (file-relative-name nextel-build--here root)))
+    (when (string-prefix-p ".." relative)
+      (error "nextel: load the copy of nextel-build.el that is in the project (vendor/elisp-next/lisp/), not %s"
+             nextel-build--here))
+    (file-name-as-directory relative)))
 
 (defun nextel-project-root (&optional file)
   "The project of FILE (or of `default-directory'): the directory above it
@@ -108,15 +124,15 @@ PAGE FILE) ...) :layout :not-found :api ((PATTERN FILE) ...) :shared FILES
                                 (append helpers (sort page-files #'string<))))))
 
 (defun nextel-routes-text (project)
-  "The text of nextel/routes.el for PROJECT (`nextel-read-project')."
+  "The text of `nextel-routes-file' for PROJECT (`nextel-read-project')."
   (let* ((routes (plist-get project :routes))
          (width (apply #'max 0 (mapcar (lambda (route) (+ 2 (length (car route)))) routes))))
     (concat
      ";;; routes.el --- which page is which address  -*- lexical-binding: t; -*-\n\n"
-     ";; Written by nextel/nextel-build.el from pages/: do not edit, write it\n"
-     ";; again (M-x nextel-write-routes, or tools/nextel-routes.sh).\n"
+     ";; Written by nextel-build.el (elisp-next) from pages/: do not edit,\n"
+     ";; write it again (M-x nextel-write-routes, or bin/nextel-routes).\n"
      ";;\n"
-     ";; The server's routes, from api/ (nextel/nextel-server.el reads that directory itself):\n"
+     ";; The server's routes, from api/ (nextel-server.el reads that directory itself):\n"
      (if (plist-get project :api)
          (mapconcat (lambda (route) (format (format ";;   %%-%ds  %%s" width) (car route) (cadr route)))
                     (plist-get project :api) "\n")
@@ -147,12 +163,14 @@ PAGE FILE) ...) :layout :not-found :api ((PATTERN FILE) ...) :shared FILES
               "\n"))
     (buffer-string)))
 
-(defun nextel-index-text (html project)
-  "index.html (its text HTML) with the places for PROJECT filled in."
-  (nextel--fill (nextel--fill html "framework"
-                              (append '("nextel/nextel-schema.el" "nextel/nextel-route.el" "nextel/nextel.el")
-                                      (plist-get project :shared)))
-                "pages" (append (plist-get project :page-scripts) '("nextel/routes.el"))))
+(defun nextel-index-text (html project root)
+  "index.html (its text HTML) of ROOT with the places for PROJECT filled in."
+  (let ((framework (nextel--framework-directory root)))
+    (nextel--fill (nextel--fill html "framework"
+                                (append (mapcar (lambda (name) (concat framework name))
+                                                '("nextel-schema.el" "nextel-route.el" "nextel.el"))
+                                        (plist-get project :shared)))
+                  "pages" (append (plist-get project :page-scripts) (list nextel-routes-file)))))
 
 (defun nextel--file-text (file)
   (and (file-exists-p file)
@@ -164,8 +182,8 @@ PAGE FILE) ...) :layout :not-found :api ((PATTERN FILE) ...) :shared FILES
   "((FILE . TEXT) ...): what the routes of ROOT are to be."
   (let ((project (nextel-read-project root))
         (index (expand-file-name "index.html" root)))
-    (list (cons (expand-file-name "nextel/routes.el" root) (nextel-routes-text project))
-          (cons index (nextel-index-text (nextel--file-text index) project)))))
+    (list (cons (expand-file-name nextel-routes-file root) (nextel-routes-text project))
+          (cons index (nextel-index-text (nextel--file-text index) project root)))))
 
 (defun nextel--write (file text)
   "Make FILE's text TEXT: through its buffer when one visits it (so that
@@ -184,7 +202,7 @@ the buffer and the file stay one), else directly."
         (save-buffer)))))
 
 (defun nextel-write-routes (&optional root)
-  "Write nextel/routes.el and the <script> tags of index.html from pages/.
+  "Write `nextel-routes-file' and the <script> tags of index.html from pages/.
 ROOT is the project, by default the one of the current buffer's file.
 Returns the files that changed."
   (interactive)
@@ -209,7 +227,7 @@ Returns the files that changed."
                               (nextel--outputs root))))
     (if (null stale)
         (message "nextel: the routes are up to date")
-      (message "nextel: not up to date: %s; write them (M-x nextel-write-routes, tools/nextel-routes.sh)"
+      (message "nextel: not up to date: %s; write them (M-x nextel-write-routes, bin/nextel-routes)"
                (mapconcat (lambda (output) (file-relative-name (car output) root)) stale ", ")))
     (when noninteractive (kill-emacs (if stale 1 0)))
     (null stale)))

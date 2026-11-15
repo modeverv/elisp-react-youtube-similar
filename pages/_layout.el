@@ -1,9 +1,9 @@
 ;;; _layout.el --- around every page: header, sidebar, dialogs, messages  -*- lexical-binding: t; -*-
 
-;; The layout (nextel/nextel.el) stays mounted from one page to the next: it
+;; The layout (elisp-next) stays mounted from one page to the next: it
 ;; holds what every page needs (the settings, history and "watch later")
 ;; and gets the page of the address as its :children.  Which page that is
-;; comes from the file names of pages/ (nextel/nextel-build.el).
+;; comes from the file names of pages/ (elisp-next's nextel-build.el).
 
 (require 'seq)
 (require 'subr-x)

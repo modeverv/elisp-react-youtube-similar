@@ -1,8 +1,12 @@
 ;;; nextel-server.el --- files as API routes, for server.el  -*- lexical-binding: t; -*-
 
+;; Copyright (c) 2026 modeverv
+;; SPDX-License-Identifier: MIT
+;; This file is part of elisp-next: https://github.com/modeverv/elisp-next
+
 ;; server.el:
 ;;
-;;   (load (expand-file-name "nextel/nextel-server.el" app-server-project-directory) nil t)
+;;   (load (expand-file-name "vendor/elisp-next/lisp/nextel-server.el" app-server-project-directory) nil t)
 ;;   (nextel-server-load)
 ;;
 ;; loads nextel-schema.el and nextel-route.el, the files of shared/ (the types
@@ -32,11 +36,24 @@
 
 (require 'cl-lib)
 
+;; elisp-studio's lisp/app-server.el, which serve-project.el and the
+;; studio's tab load before server.el.
+(defvar app-server-project-directory)
+(declare-function app-server-data "app-server")
+(declare-function app-server-refuse "app-server")
+(declare-function app-server-defer "app-server")
+(declare-function app-server--deferred-p "app-server")
+(declare-function app-server--deferred-function "app-server")
+
 (defconst nextel-server--here (file-name-directory (or load-file-name buffer-file-name default-directory))
   "The directory of nextel-server.el, where its companions are.")
 
 (load (expand-file-name "nextel-schema.el" nextel-server--here) nil t)
 (load (expand-file-name "nextel-route.el" nextel-server--here) nil t)
+(declare-function nextel-match "nextel-route")
+(declare-function nextel-pattern-of-file "nextel-route")
+(declare-function nextel-pattern< "nextel-route")
+(declare-function nextel-check "nextel-schema")
 
 (defvar nextel-server-routes nil
   "((PATTERN METHOD . SPEC) ...), in the order they are tried.")

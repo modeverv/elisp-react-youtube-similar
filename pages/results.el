@@ -1,6 +1,6 @@
 ;;; results.el --- the search results, /results?search_query=TEXT  -*- lexical-binding: t; -*-
 
-;; The first part of the results comes from :load (nextel/nextel.el): the
+;; The first part of the results comes from :load (elisp-next): the
 ;; router waits for it, shows :loading meanwhile and :error if it fails,
 ;; and keeps it for Back.  The page adds the parts after it itself.
 

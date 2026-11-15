@@ -35,7 +35,7 @@
         "use strict";
         // elisp-studio's preview is a srcdoc frame.  (The address is not
         // this script's: elisp-react keeps it, also there, and the router of
-        // nextel/nextel.el follows it.)
+        // elisp-next follows it.)
         const studio = location.href === "about:srcdoc";
         let input = null;   // #parens-port-in, once Lisp has rendered it
         let done = 0;       // the number of the last command carried out
@@ -203,12 +203,12 @@
     </script>
 
     <!-- The program: loaded in this order, in one Emacs. -->
-    <!-- The framework (nextel/) and the types the server shares (shared/):
-         nextel/nextel-build.el writes this list. -->
+    <!-- The framework (elisp-next, in vendor/) and the types the server
+         shares (shared/): elisp-next's nextel-build.el writes this list. -->
     <!-- nextel:framework -->
-    <script type="text/emacs-lisp" src="nextel/nextel-schema.el"></script>
-    <script type="text/emacs-lisp" src="nextel/nextel-route.el"></script>
-    <script type="text/emacs-lisp" src="nextel/nextel.el"></script>
+    <script type="text/emacs-lisp" src="vendor/elisp-next/lisp/nextel-schema.el"></script>
+    <script type="text/emacs-lisp" src="vendor/elisp-next/lisp/nextel-route.el"></script>
+    <script type="text/emacs-lisp" src="vendor/elisp-next/lisp/nextel.el"></script>
     <script type="text/emacs-lisp" src="shared/parens-types.el"></script>
     <!-- /nextel:framework -->
     <script type="text/emacs-lisp" src="lisp/parens-util.el"></script>
@@ -218,8 +218,8 @@
     <script type="text/emacs-lisp" src="lisp/parens-state.el"></script>
     <script type="text/emacs-lisp" src="lisp/parens-ui.el"></script>
     <script type="text/emacs-lisp" src="lisp/parens-pages.el"></script>
-    <!-- The pages (pages/: a file is an address) and nextel/routes.el, which
-         mounts the application: nextel/nextel-build.el writes this list. -->
+    <!-- The pages (pages/: a file is an address) and routes.el, which
+         mounts the application: elisp-next's nextel-build.el writes this list. -->
     <!-- nextel:pages -->
     <script type="text/emacs-lisp" src="pages/_layout.el"></script>
     <script type="text/emacs-lisp" src="pages/404.el"></script>
@@ -229,7 +229,7 @@
     <script type="text/emacs-lisp" src="pages/playlist.el"></script>
     <script type="text/emacs-lisp" src="pages/results.el"></script>
     <script type="text/emacs-lisp" src="pages/watch.el"></script>
-    <script type="text/emacs-lisp" src="nextel/routes.el"></script>
+    <script type="text/emacs-lisp" src="routes.el"></script>
     <!-- /nextel:pages -->
     <script type="module" src="https://modeverv.github.io/elisp-react/js/elisp-react.js"></script>
   </body>
