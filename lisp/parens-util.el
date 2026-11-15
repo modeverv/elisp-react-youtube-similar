@@ -193,12 +193,15 @@ elisp-react prints a list as it is, (a b), so classes are joined here."
 
 (defun parens-decode (text)
   "TEXT with %XX escapes decoded as UTF-8."
-  (decode-coding-string (url-unhex-string (replace-regexp-in-string "\\+" " " text)) 'utf-8))
+  ;; As bytes first: a hash typed by hand may hold raw characters too.
+  (decode-coding-string (url-unhex-string (encode-coding-string (replace-regexp-in-string "\\+" " " text) 'utf-8))
+                        'utf-8))
 
 (defun parens-json (object)
   "OBJECT as JSON text, as characters.
 `json-serialize' gives UTF-8 bytes; the DOM wants characters."
-  (decode-coding-string (json-serialize object) 'utf-8))
+  (let ((json (json-serialize object)))
+    (if (multibyte-string-p json) json (decode-coding-string json 'utf-8))))
 
 (defun parens-timestamp-seconds (text)
   "The seconds of a timestamp such as \"1:23\" or \"1:02:03\"."

@@ -68,7 +68,7 @@
   "Send MESSAGE (a plist) to Lisp through the port, as index.html does."
   (let ((input (parens-test-host (lambda (props _host) (equal (plist-get props :id) "parens-port-in")))))
     (should input)
-    (parens-test-event input "input" :type "input" :value (decode-coding-string (json-serialize message) 'utf-8))))
+    (parens-test-event input "input" :type "input" :value (parens-json message))))
 
 (defvar parens-test-done 0)
 
@@ -137,7 +137,7 @@
         :statistics (list :viewCount "123456" :likeCount "789" :commentCount "12")
         :status (list :embeddable (if (eq embeddable :no) :false t))))
 
-(defun parens-test-json (object) (decode-coding-string (json-serialize object) 'utf-8))
+(defun parens-test-json (object) (parens-json object))
 
 ;;;; Words, numbers, dates
 
@@ -197,6 +197,8 @@
   (should (equal (parens-route-parse "#/watch?v=8V4ZyEL_i-s&t=90s") '(:page watch :v "8V4ZyEL_i-s" :t 90)))
   (should (equal (parens-route-parse "#/watch?v=bad\"id") '(:page home)))
   (should (equal (parens-route-parse "#/results?search_query=%E6%95%B0%E5%AD%A6+emacs")
+                 '(:page results :q "数学 emacs")))
+  (should (equal (parens-route-parse "#/results?search_query=数学%20emacs")
                  '(:page results :q "数学 emacs")))
   (should (equal (parens-route-parse "#/channel/UC0uTPqBCFIpZxlz_Lv1tk_g")
                  '(:page channel :id "UC0uTPqBCFIpZxlz_Lv1tk_g")))
@@ -268,7 +270,8 @@
   (let ((html (parens-test-html)))
     (should (string-match-p "youtube-nocookie.com/embed/JJPokfFxyFo\\?" html))
     (should (string-match-p "start=30" html))
-    (should (string-match-p "origin=https://example.test" html))
+    ;; Emacs 29's url-build-query-string escapes ":" and "/", 30 does not.
+    (should (string-match-p "origin=https\\(://\\|%3A%2F%2F\\)example.test" html))
     (should (string-match-p "credentialless" html))
     (should (string-match-p "referrerpolicy=\"strict-origin-when-cross-origin\"" html))
     (should (string-match-p "Video JJPokfFxyFo" html)))
