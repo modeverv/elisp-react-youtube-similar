@@ -41,6 +41,19 @@ With the server (feeds, no key): from a checkout of elisp-studio next to this on
 ../elisp-studio/tools/serve-project.sh . 8931     # then http://localhost:8931/
 ```
 
+The server keeps the last reading of the feeds (`app-server-write`) and reads them again every 15 minutes in a job (`app-server-defjob`, [api/_feeds.el](api/_feeds.el)); `serve-project.sh` runs it by itself. YouTube's feeds fail now and then (404 or 500 for a feed that is there): a failed feed is asked once more, and a channel that still fails keeps its videos of the last reading.
+
+On a shared host that runs CGI programs and nothing that stays (Sakura's rental server, for one), with elisp-studio's deployment kit:
+
+```sh
+mkdir -p server/cgi                                # not part of the repository (.gitignore)
+cp ../elisp-studio/tools/serve-project.el ../elisp-studio/tools/serve-cgi.el ../elisp-studio/lisp/app-server.el server/
+cp ../elisp-studio/tools/project/cgi/* server/cgi/
+server/cgi/deploy.sh myhost www/parens parens-app https://example.com
+```
+
+and give `parens-app/job.sh` to cron (`*/15 * * * *`). Each request is then an Emacs of its own, which answers what the job kept and never reads the feeds: `/api/feed` is 503 until the first reading, and the page shows its own list meanwhile. Tried on Sakura (Emacs 27.2, which fetches `https:` through `curl`): a request takes 7 ms in Emacs, a reading of the 9 feeds 0.5–1.3 s.
+
 In elisp-studio, on your own machine (edit the files with any editor, the page follows):
 
 ```sh

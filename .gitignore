@@ -7,3 +7,5 @@ node_modules/
 # written by elisp-studio's tools: the studio's address, the server's data
 .elisp-studio.json
 .data/
+# elisp-studio's deployment kit, copied for server/cgi/deploy.sh
+/server/
