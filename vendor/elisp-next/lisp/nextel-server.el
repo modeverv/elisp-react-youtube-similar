@@ -6,6 +6,7 @@
 
 ;; server.el:
 ;;
+;;   (declare-function nextel-server-load "nextel-server")
 ;;   (load (expand-file-name "vendor/elisp-next/lisp/nextel-server.el" app-server-project-directory) nil t)
 ;;   (nextel-server-load)
 ;;
@@ -28,6 +29,12 @@
 ;; (400, with the field that is wrong); an answer that is not of :returns
 ;; is the server's mistake (500, and the log says which field).  A handler
 ;; may refuse (`app-server-refuse') and answer later (`app-server-defer').
+;;
+;; A path is answered by the most specific file whose pattern it matches
+;; (api/things/new.el before api/things/[id].el); a method that file does
+;; not handle is 405.  Hidden files and directories (an Emacs lock file,
+;; .#later.el, while a buffer has unsaved changes) are left out, as the
+;; routes writer leaves them out.
 ;;
 ;; The same files run in elisp-studio's tab, which has a copy of the
 ;; project's text files in `app-server-project-directory'.
@@ -74,6 +81,16 @@ commentary of nextel-server.el."
   "Non-nil if RELATIVE (a path under api/) is a helper, not a route."
   (cl-some (lambda (part) (string-prefix-p "_" part)) (split-string relative "/" t)))
 
+(defun nextel-server--lisp-files (directory)
+  "The .el files under DIRECTORY, sorted, without hidden files and
+directories."
+  (and (file-directory-p directory)
+       (sort (cl-remove-if (lambda (file)
+                             (cl-some (lambda (part) (string-prefix-p "." part))
+                                      (split-string (file-relative-name file directory) "/" t)))
+                           (directory-files-recursively directory "\\.el\\'"))
+             #'string<)))
+
 (defun nextel-server-load (&optional directory)
   "Load shared/ and api/ of DIRECTORY (the project), and answer /api/ with them."
   (let* ((root (file-name-as-directory
@@ -81,10 +98,9 @@ commentary of nextel-server.el."
                                       default-directory))))
          (shared (expand-file-name "shared/" root))
          (api (expand-file-name "api/" root))
-         (files (and (file-directory-p api) (sort (directory-files-recursively api "\\.el\\'") #'string<))))
-    (when (file-directory-p shared)
-      (dolist (file (sort (directory-files-recursively shared "\\.el\\'") #'string<))
-        (load file nil t)))
+         (files (nextel-server--lisp-files api)))
+    (dolist (file (nextel-server--lisp-files shared))
+      (load file nil t))
     (setq nextel-server-routes nil)
     (dolist (file files)
       (when (nextel-server--private-p (file-relative-name file api))
@@ -123,11 +139,17 @@ commentary of nextel-server.el."
          (app-server-refuse (format "The server's answer is wrong: %s" (cadr failure)) 500))))))
 
 (defun nextel-server-handle (method path body)
-  "Answer METHOD at PATH with the route of api/ that it matches."
+  "Answer METHOD at PATH with the route of api/ that it matches.
+The most specific pattern that matches PATH answers; a METHOD that its
+file does not handle is 405, also when a less specific file would."
   (let ((matching (cl-remove-if-not (lambda (route) (nextel-match (car route) path)) nextel-server-routes)))
     (unless matching
       (signal 'file-missing (list "No such API" path)))
-    (let ((route (cl-find method matching :key #'cadr :test #'equal)))
+    ;; `nextel-server-routes' is in the order patterns are tried: the first
+    ;; that matches is the most specific.
+    (let* ((pattern (car (car matching)))
+           (route (cl-find-if (lambda (route) (and (equal (car route) pattern) (equal (cadr route) method)))
+                              matching)))
       (unless route
         (app-server-refuse (format "%s is not allowed at %s" method path) 405))
       (let* ((pattern (car route))
