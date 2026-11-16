@@ -16,11 +16,14 @@
 ;;     :render (lambda (self)
 ;;               (jsx (h1 (plist-get (nextel-data self) :title)))))
 ;;
-;; - :load gets the route and returns an awaitable (`react-await'); the
-;;   page renders when it has answered, with the value as (nextel-data
-;;   SELF).  Meanwhile :loading, after a failure :error (or the defaults,
+;; - :load gets the route and returns an awaitable, a function of RESOLVE
+;;   and REJECT (`nextel-request', not a `react-async' task); the page
+;;   renders when it has answered, with the value as (nextel-data SELF).
+;;   Meanwhile :loading, after a failure :error (or the defaults,
 ;;   `nextel-loading-function' and `nextel-error-function').  The answers are
-;;   kept by route (`react-query'): going back shows them at once.
+;;   kept by route (`react-query'): going back shows them at once, and loads
+;;   them again in the background when they are older than
+;;   `nextel-stale-ms'.
 ;; - :head gives the document's :title, :description and other :meta.
 ;; - The page gets the props :route, a plist (:page :pattern :path
 ;;   :params :query), and :data.  `nextel-param' and `nextel-query' read it.
@@ -63,7 +66,11 @@
   "((PATTERN . PAGE) ...), in the order they are tried (routes.el).")
 (defvar nextel-layout nil "The layout component around every page, or nil.")
 (defvar nextel-not-found nil "The page of an address that no page has, or nil.")
-(defvar nextel-stale-ms 60000 "How long a page's loaded data counts as fresh.")
+(defvar nextel-stale-ms 60000
+  "How long, in milliseconds, a page's loaded data counts as fresh.
+Coming to an address whose data is older loads it again in the
+background; the page shows the data it has meanwhile.  nil: never (then
+only `nextel-reload' and a retry load data again).")
 (defvar nextel-loading-function (lambda (_route) "")
   "The element shown while a page without :loading loads: (ROUTE).")
 (defvar nextel-error-function
@@ -212,13 +219,38 @@ with SPEC.  It gets the props :route and :children (the page)."
         (dolist (entry meta) (react-set-meta (car entry) (cdr entry)))
         nil))))
 
+(defvar nextel--loaded-at (make-hash-table :test #'equal)
+  "When the data under each key of a page was loaded, a `float-time'.")
+(defvar nextel--arrived nil
+  "The key of the address that the router rendered last.")
+
+(defun nextel--timed (key awaitable)
+  "AWAITABLE, noting in `nextel--loaded-at' when it answered under KEY."
+  (lambda (resolve reject)
+    (funcall awaitable
+             (lambda (data) (puthash key (float-time) nextel--loaded-at) (funcall resolve data))
+             reject)))
+
+(defun nextel--arrive (key)
+  "At a new address, whose data is under KEY: load it again if it is stale.
+`react-query' looks at the age of data only when a component reads a key
+for the first time, and the router keeps reading every key it has read."
+  (unless (equal key nextel--arrived)
+    (setq nextel--arrived key)
+    (let ((loaded (gethash key nextel--loaded-at)))
+      (when (and loaded nextel-stale-ms
+                 (> (* 1000 (- (float-time) loaded)) nextel-stale-ms))
+        (react-invalidate key)))))
+
 (defun nextel--page-element (self route)
   "The element of ROUTE's page, or what to show while it loads or failed."
   (let* ((page (plist-get route :page))
          (spec (and page (get page 'nextel-page)))
          (load (plist-get spec :load))
-         (key (nextel--query-key route))
-         (state (and load (react-query self key (lambda () (funcall load route)) :stale-ms nextel-stale-ms)))
+         (key (progn (nextel--arrive (nextel--query-key route)) (nextel--query-key route)))
+         (state (and load
+                     (react-query self key (lambda () (nextel--timed key (funcall load route)))
+                                  :stale-ms (or nextel-stale-ms 0))))
          (status (plist-get state :status)))
     (nextel--head self route spec status (plist-get state :data))
     (cond ((null page) "")
@@ -232,7 +264,9 @@ with SPEC.  It gets the props :route and :children (the page)."
                                 (and nextel-page-props-function (funcall nextel-page-props-function route))))))))
 
 (react-define-component 'nextel-router
-  :initial-state (lambda (_props) (list :location (react-location)))
+  :initial-state (lambda (_props)
+                   (setq nextel--arrived nil)
+                   (list :location (react-location)))
   :render
   (lambda (self)
     (react-effect self 'nextel-location nil
