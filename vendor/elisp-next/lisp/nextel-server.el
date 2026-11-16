@@ -38,6 +38,15 @@
 ;;
 ;; The same files run in elisp-studio's tab, which has a copy of the
 ;; project's text files in `app-server-project-directory'.
+;;
+;; A process that answers one request and ends (a CGI: elisp-studio's
+;; serve-cgi.el sets `app-server-single-request') loads only the file that
+;; answers it: the patterns come from the file names, so the others are
+;; not read.  Anywhere else every route is loaded at the start, so that a
+;; mistake in one shows at once; `nextel-server-lazy' chooses.  A file's
+;; .elc, when it is newer, is loaded instead of it, here and for
+;; nextel-schema.el and nextel-route.el (compiled where the project is
+;; deployed: elisp-studio's server/cgi/install.sh).
 
 ;;; Code:
 
@@ -46,6 +55,7 @@
 ;; elisp-studio's lisp/app-server.el, which serve-project.el and the
 ;; studio's tab load before server.el.
 (defvar app-server-project-directory)
+(defvar app-server-single-request)
 (declare-function app-server-data "app-server")
 (declare-function app-server-refuse "app-server")
 (declare-function app-server-defer "app-server")
@@ -55,15 +65,27 @@
 (defconst nextel-server--here (file-name-directory (or load-file-name buffer-file-name default-directory))
   "The directory of nextel-server.el, where its companions are.")
 
-(load (expand-file-name "nextel-schema.el" nextel-server--here) nil t)
-(load (expand-file-name "nextel-route.el" nextel-server--here) nil t)
+(defun nextel-server--load (file)
+  "Load FILE, or its .elc when that is newer."
+  (let ((compiled (concat file "c")))
+    (load (if (file-newer-than-file-p compiled file) compiled file) nil t t)))
+
+(nextel-server--load (expand-file-name "nextel-schema.el" nextel-server--here))
+(nextel-server--load (expand-file-name "nextel-route.el" nextel-server--here))
 (declare-function nextel-match "nextel-route")
 (declare-function nextel-pattern-of-file "nextel-route")
 (declare-function nextel-pattern< "nextel-route")
 (declare-function nextel-check "nextel-schema")
 
 (defvar nextel-server-routes nil
-  "((PATTERN METHOD . SPEC) ...), in the order they are tried.")
+  "((PATTERN METHOD . SPEC) ...), in the order they are tried: those of
+the files loaded so far.")
+(defvar nextel-server-lazy nil
+  "Non-nil: load a file of api/ when a request first needs it, not at the
+start.  Also when `app-server-single-request' is non-nil.")
+(defvar nextel-server--files nil
+  "((PATTERN . FILE) ...): the route files of api/, most specific first.")
+(defvar nextel-server--loaded nil "The route files loaded.")
 (defvar nextel-server--loading nil "The pattern of the api/ file being loaded.")
 
 (defun nextel-handle (method &rest spec)
@@ -91,8 +113,21 @@ directories."
                            (directory-files-recursively directory "\\.el\\'"))
              #'string<)))
 
+(defun nextel-server--load-route (entry)
+  "Load the route file of ENTRY, (PATTERN . FILE), unless it is loaded."
+  (unless (member (cdr entry) nextel-server--loaded)
+    (push (cdr entry) nextel-server--loaded)
+    (let ((nextel-server-routes nil))
+      (let ((nextel-server--loading (car entry)))
+        (nextel-server--load (cdr entry)))
+      (setq entry (nreverse nextel-server-routes)))
+    (setq nextel-server-routes
+          (sort (append nextel-server-routes entry) (lambda (a b) (nextel-pattern< (car a) (car b)))))))
+
 (defun nextel-server-load (&optional directory)
-  "Load shared/ and api/ of DIRECTORY (the project), and answer /api/ with them."
+  "Load shared/ and api/ of DIRECTORY (the project), and answer /api/ with them.
+Returns the routes loaded: all of them, or none when the files of api/
+are loaded as requests need them (`nextel-server-lazy')."
   (let* ((root (file-name-as-directory
                 (expand-file-name (or directory (and (boundp 'app-server-project-directory) app-server-project-directory)
                                       default-directory))))
@@ -100,18 +135,17 @@ directories."
          (api (expand-file-name "api/" root))
          (files (nextel-server--lisp-files api)))
     (dolist (file (nextel-server--lisp-files shared))
-      (load file nil t))
-    (setq nextel-server-routes nil)
+      (nextel-server--load file))
+    (setq nextel-server-routes nil nextel-server--loaded nil nextel-server--files nil)
     (dolist (file files)
-      (when (nextel-server--private-p (file-relative-name file api))
-        (load file nil t)))
-    (dolist (file files)
-      (let ((relative (file-relative-name file root)))
-        (unless (nextel-server--private-p (file-relative-name file api))
-          (let ((nextel-server--loading (nextel-pattern-of-file relative)))
-            (load file nil t)))))
-    (setq nextel-server-routes
-          (sort (nreverse nextel-server-routes) (lambda (a b) (nextel-pattern< (car a) (car b)))))
+      (if (nextel-server--private-p (file-relative-name file api))
+          (nextel-server--load file)
+        (push (cons (nextel-pattern-of-file (file-relative-name file root)) file) nextel-server--files)))
+    ;; A stable sort: of two files with one pattern, the first in the alphabet first.
+    (setq nextel-server--files
+          (sort (nreverse nextel-server--files) (lambda (a b) (nextel-pattern< (car a) (car b)))))
+    (unless (or nextel-server-lazy (bound-and-true-p app-server-single-request))
+      (mapc #'nextel-server--load-route nextel-server--files))
     (defalias 'app-server-handle #'nextel-server-handle)
     nextel-server-routes))
 
@@ -142,14 +176,22 @@ directories."
   "Answer METHOD at PATH with the route of api/ that it matches.
 The most specific pattern that matches PATH answers; a METHOD that its
 file does not handle is 405, also when a less specific file would."
-  (let ((matching (cl-remove-if-not (lambda (route) (nextel-match (car route) path)) nextel-server-routes)))
-    (unless matching
+  ;; The files in the order their patterns are tried: the first that
+  ;; matches and handles anything at all is the most specific.
+  (let ((pattern nil)
+        (files nextel-server--files))
+    (while (and files (not pattern))
+      (let ((entry (pop files)))
+        (when (nextel-match (car entry) path)
+          ;; Every file of that pattern (api/feed.el and api/feed/index.el).
+          (dolist (same (cons entry (cl-remove-if-not (lambda (other) (equal (car other) (car entry))) files)))
+            (nextel-server--load-route same))
+          (when (assoc (car entry) nextel-server-routes)
+            (setq pattern (car entry))))))
+    (unless pattern
       (signal 'file-missing (list "No such API" path)))
-    ;; `nextel-server-routes' is in the order patterns are tried: the first
-    ;; that matches is the most specific.
-    (let* ((pattern (car (car matching)))
-           (route (cl-find-if (lambda (route) (and (equal (car route) pattern) (equal (cadr route) method)))
-                              matching)))
+    (let ((route (cl-find-if (lambda (route) (and (equal (car route) pattern) (equal (cadr route) method)))
+                             nextel-server-routes)))
       (unless route
         (app-server-refuse (format "%s is not allowed at %s" method path) 405))
       (let* ((pattern (car route))
