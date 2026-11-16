@@ -41,6 +41,19 @@ node tools/serve.mjs          # GitHub Pages と同じ静的な配信: http://lo
 ../elisp-studio/tools/serve-project.sh . 8931     # http://localhost:8931/
 ```
 
+サーバーは最後に読んだフィードを保存し（`app-server-write`）、15分ごとにジョブで読み直します（`app-server-defjob`、[api/_feeds.el](api/_feeds.el)）。`serve-project.sh` はこのジョブを自分で動かします。YouTube のフィードはときどき失敗します（存在するフィードに 404 や 500）。失敗したフィードはもう一度だけ取りに行き、それでも失敗したチャンネルは前回の動画を引き継ぎます。
+
+CGI しか動かせず、常駐するプロセスを置けない共用ホスト（さくらのレンタルサーバなど）では、elisp-studio のデプロイ用キットを使います。
+
+```sh
+mkdir -p server/cgi                                # リポジトリには含めません（.gitignore）
+cp ../elisp-studio/tools/serve-project.el ../elisp-studio/tools/serve-cgi.el ../elisp-studio/lisp/app-server.el server/
+cp ../elisp-studio/tools/project/cgi/* server/cgi/
+server/cgi/deploy.sh myhost www/parens parens-app https://example.com
+```
+
+そして `parens-app/job.sh` を cron に登録します（`*/15 * * * *`）。するとリクエストごとに Emacs が起動し、ジョブが保存したものを答えるだけで、フィードは読みに行きません。最初の読み込みまでは `/api/feed` が 503 を返し、そのあいだページは自前のリストを表示します。さくら（Emacs 27.2。`https:` は `curl` で取りに行きます）で試したところ、1リクエストは Emacs の中で 7 ms、9本のフィードの読み込みは 0.5〜1.3 秒でした。
+
 自分のマシンの elisp-studio で（好きなエディタでファイルを編集すると、ページが追従します）:
 
 ```sh

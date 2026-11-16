@@ -434,6 +434,106 @@ and changes it with requests whose bodies and answers are checked against
     (should (equal (car (funcall call "PATCH" "/api/later")) 405))
     (should (equal (car (funcall call "GET" "/api/nothing")) 404))))
 
+(defconst parens-test-feed
+  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<feed xmlns:yt=\"http://www.youtube.com/xml/schemas/2015\" xmlns:media=\"http://search.yahoo.com/mrss/\" xmlns=\"http://www.w3.org/2005/Atom\">
+ <entry>
+  <yt:videoId>%s</yt:videoId>
+  <yt:channelId>%s</yt:channelId>
+  <title>Video of %s</title>
+  <author><name>Channel %s</name><uri>https://www.youtube.com/channel/%s</uri></author>
+  <published>2026-11-%02dT00:00:00+00:00</published>
+  <media:group>
+   <media:description>About it</media:description>
+   <media:community><media:starRating count=\"5\"/><media:statistics views=\"100\"/></media:community>
+  </media:group>
+ </entry>
+</feed>"
+  "A channel's feed with one video: id, channel id (twice more), day.")
+
+(ert-deftest parens-server-feed-job ()
+  "/api/feed answers what the job kept, and never reads the feeds itself
+in a process for one request (a CGI)."
+  (skip-unless (file-readable-p parens-test-studio))
+  (load parens-test-studio nil t)
+  (skip-unless (fboundp 'app-server-defjob))
+  (let* ((fetched 0)
+         (app-server-data-directory (file-name-as-directory (make-temp-file "parens-test-data" t)))
+         (app-server-project-directory parens-test-root)
+         (app-server-fetch-function
+          (lambda (url _method _headers _body then _catch)
+            (setq fetched (1+ fetched))
+            (let ((channel (concat "UC" (substring (car (last (split-string url "=UULF"))) 0))))
+              (funcall then (list :status 200 :ok t
+                                  :text (format parens-test-feed (format "v%010d" fetched) channel channel channel
+                                                channel fetched))))))
+         (call (lambda (method path)
+                 (let ((answer (app-server-respond method path "")))
+                   (list (aref answer 0) (car (read-from-string (aref answer 1))))))))
+    (unwind-protect
+        (dlet ((app-server-single-request t))
+          (setq parens-server-cache nil)
+          (load (expand-file-name "server.el" parens-test-root) nil t)
+          ;; Nothing kept yet: 503, and no feed is read.
+          (should (equal (funcall call "GET" "/api/feed")
+                         '(503 "The feeds have not been read yet; try again in a few minutes")))
+          (should (= fetched 0))
+          ;; The job reads the 9 feeds and keeps them.
+          (should (equal (app-server-run-jobs 'parens-feeds) '((parens-feeds . done))))
+          (should (= fetched 9))
+          (should (= (length (plist-get (cdr (app-server-read "feed")) :videos)) 9))
+          ;; The next process (nothing in memory) answers what was kept.
+          (setq parens-server-cache nil)
+          (let ((answer (funcall call "GET" "/api/feed")))
+            (should (equal (car answer) 200))
+            (should (equal (plist-get (car (plist-get (cadr answer) :videos)) :published) "2026-11-09T00:00:00+00:00"))
+            (should (= (length (plist-get (cadr answer) :channels)) 9)))
+          (should (= fetched 9))
+          ;; An old reading is still the answer there: the job will read again.
+          (app-server-write "feed" (cons (- (float-time) 3600) (cdr (app-server-read "feed"))))
+          (setq parens-server-cache nil)
+          (should (equal (car (funcall call "GET" "/api/feed")) 200))
+          (should (= fetched 9))
+          ;; The job is due every 15 minutes, not sooner.
+          (should (equal (app-server-run-jobs) '((app-server-cleanup . done) (parens-feeds . not-due))))
+          ;; YouTube's feeds fail now and then.  A feed that fails is asked
+          ;; again; a channel that fails twice keeps its last videos.
+          (let* ((asked nil)
+                 (feeds app-server-fetch-function)
+                 (app-server-fetch-function
+                  (lambda (url method headers body then catch)
+                    (push url asked)
+                    (cond ((and (string-match-p "UULF0uTP" url) (= (cl-count url asked :test #'equal) 1))
+                           (funcall then '(:status 500 :ok nil :text "")))
+                          ((string-match-p "UULFAiiO" url) (funcall catch "connection reset"))
+                          (t (funcall feeds url method headers body then catch))))))
+            (setq fetched 0)
+            (should (equal (app-server-run-jobs 'parens-feeds) '((parens-feeds . done))))
+            (should (= (length asked) 11))
+            (let ((kept (cdr (app-server-read "feed"))))
+              (should (equal (plist-get kept :errors) '(("UCAiiOTio8Yu69c3XnR7nQBQ" . "fetch failed: connection reset"))))
+              (should (= (length (plist-get kept :videos)) 9))
+              (should (seq-find (lambda (video) (equal (plist-get video :channel-id) "UCAiiOTio8Yu69c3XnR7nQBQ"))
+                                (plist-get kept :videos)))
+              (should (= (length (plist-get kept :channels)) 9)))))
+      (delete-directory app-server-data-directory t))
+    ;; A resident server (run.sh) reads an old reading again, at the
+    ;; request; when that fails, the old one is the answer.
+    (setq app-server-data-directory (file-name-as-directory (make-temp-file "parens-test-data" t)))
+    (unwind-protect
+        (let ((app-server-fetch-function (lambda (_url _method _headers _body _then catch)
+                                           (setq fetched (1+ fetched))
+                                           (funcall catch "no network")))
+              (later nil))
+          (app-server-write "feed" (cons (- (float-time) 3600) '(:videos nil :channels nil :errors nil)))
+          (setq parens-server-cache nil fetched 0)
+          (let ((answer (app-server-respond "GET" "/api/feed" ""
+                                            (lambda (status text _headers) (setq later (list status text))))))
+            (should (= fetched 18))           ; each feed asked twice
+            (should (equal (if answer (list (aref answer 0) (aref answer 1)) later)
+                           '(200 "(:videos nil :channels nil :errors nil)")))))
+      (delete-directory app-server-data-directory t))))
+
 (ert-deftest parens-server-failure-falls-back ()
   (parens-test-start)
   (parens-test-hello)
